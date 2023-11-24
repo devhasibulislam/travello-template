@@ -70,7 +70,7 @@ const Dashboard = () => {
                           alt={crt?.user?.avatar?.public_id}
                           height={25}
                           width={25}
-                          className="rounded-secondary object-cover"
+                          className="h-[25px] w-[25px] rounded-secondary object-cover"
                         />
                         <div className="flex flex-col gap-y-0.5 flex-1 w-full">
                           <h2 className="text-sm">{crt?.user?.name}</h2>
