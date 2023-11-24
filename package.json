@@ -1,0 +1,40 @@
+{
+  "name": "travello-clone",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "start": "next start",
+    "build": "next build",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.9.5",
+    "autoprefixer": "10.4.15",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.0",
+    "eslint": "8.47.0",
+    "eslint-config-next": "13.4.16",
+    "jsonwebtoken": "^9.0.2",
+    "keen-slider": "^6.8.6",
+    "leaflet": "^1.9.4",
+    "mongoose": "^8.0.1",
+    "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0",
+    "next": "13.4.16",
+    "postcss": "8.4.27",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-hook-form": "^7.45.4",
+    "react-icons": "^4.10.1",
+    "react-leaflet": "^4.2.1",
+    "react-redux": "^8.1.2",
+    "tailwind-scrollbar-hide": "^1.1.7",
+    "tailwindcss": "3.3.3",
+    "world-countries": "^5.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.4",
+    "leaflet-defaulticon-compatibility": "^0.1.2"
+  }
+}
