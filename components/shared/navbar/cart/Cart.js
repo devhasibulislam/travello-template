@@ -64,7 +64,7 @@ const Cart = () => {
           </h1>
           <section className="h-full w-full">
             <section className="grid grid-cols-2 gap-4">
-              {isLoading ? (
+              {isLoading || cart?.length === 0 ? (
                 <>
                   {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                     <div key={i} className="p-4 border rounded">
