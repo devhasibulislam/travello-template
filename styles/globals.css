@@ -1,0 +1,98 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@700&family=Poppins:wght@400;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+h1,
+h2 {
+  font-family: "Lato", sans-serif;
+}
+
+p {
+  @apply text-neutral;
+}
+
+::selection {
+  @apply bg-secondary text-primary;
+}
+
+/* Width and height */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* Thumb */
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+}
+
+/* Thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+/* Corner */
+::-webkit-scrollbar-corner {
+  background-color: #f1f1f1;
+}
+
+/* Resizer */
+::-webkit-scrollbar-resizer {
+  background-color: #ddd;
+}
+
+input[type="radio"] {
+  @apply form-radio;
+}
+
+input[type="checkbox"] {
+  @apply form-checkbox;
+}
+
+select {
+  @apply form-select;
+}
+
+textarea {
+  @apply form-textarea;
+}
+
+[type="text"],
+[type="email"],
+[type="password"],
+[type="tel"],
+[type="number"],
+[type="date"],
+[type="search"] {
+  @apply form-input rounded text-sm;
+}
+
+input,
+textarea,
+select {
+  @apply focus:!ring-0 focus:!outline-0 focus:!outline-offset-0 focus:!border-primary;
+}
+
+textarea {
+  @apply form-textarea rounded text-sm resize-none;
+}
+
+select {
+  @apply form-select rounded text-sm resize-none;
+}
