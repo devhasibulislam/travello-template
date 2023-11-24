@@ -1,0 +1,271 @@
+/**
+ * Title: Write a program using JavaScript on FilterSidebar
+ * Author: Hasibul Islam
+ * Portfolio: https://devhasibulislam.vercel.app
+ * Linkedin: https://linkedin.com/in/devhasibulislam
+ * GitHub: https://github.com/devhasibulislam
+ * Facebook: https://facebook.com/devhasibulislam
+ * Instagram: https://instagram.com/devhasibulislam
+ * Twitter: https://twitter.com/devhasibulislam
+ * Pinterest: https://pinterest.com/devhasibulislam
+ * WhatsApp: https://wa.me/8801906315901
+ * Telegram: devhasibulislam
+ * Date: 01, November 2023
+ */
+
+import React from "react";
+import { AiOutlineReload } from "react-icons/ai";
+import { BiSolidStar } from "react-icons/bi";
+
+const FilterSidebar = () => {
+  return (
+    <aside className="lg:col-span-3 md:col-span-4 col-span-12">
+      <section className="flex flex-col gap-y-4 md:sticky md:top-4">
+        {/* reset */}
+        <div className="flex flex-row items-center justify-between border py-2 px-4 rounded">
+          <h2 className="text-lg">Filters Reset</h2>
+          <button className="p-1 border border-primary !rounded-secondary">
+            <AiOutlineReload className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Choose Category */}
+        <div className="flex flex-col gap-y-4 border py-2 px-4 rounded">
+          <h2 className="text-lg">Choose Category</h2>
+          <div className="flex flex-col gap-y-2.5">
+            <label
+              htmlFor="promo"
+              className="text-sm flex flex-row items-center gap-x-1.5"
+            >
+              <input
+                type="checkbox"
+                name="promo"
+                id="promo"
+                className="!rounded-secondary checked:bg-primary checked:text-primary"
+              />
+              Promo Deals
+            </label>
+            <label
+              htmlFor="trip"
+              className="text-sm flex flex-row items-center gap-x-1.5"
+            >
+              <input
+                type="checkbox"
+                name="trip"
+                id="trip"
+                className="!rounded-secondary checked:bg-primary checked:text-primary"
+              />
+              One Day Trip
+            </label>
+            <label
+              htmlFor="vacation"
+              className="text-sm flex flex-row items-center gap-x-1.5"
+            >
+              <input
+                type="checkbox"
+                name="vacation"
+                id="vacation"
+                className="!rounded-secondary checked:bg-primary checked:text-primary"
+              />
+              Top Vacation
+            </label>
+            <label
+              htmlFor="todo"
+              className="text-sm flex flex-row items-center gap-x-1.5"
+            >
+              <input
+                type="checkbox"
+                name="todo"
+                id="todo"
+                className="!rounded-secondary checked:bg-primary checked:text-primary"
+              />
+              Things To Do
+            </label>
+          </div>
+        </div>
+
+        {/* price Range */}
+        <div className="flex flex-col gap-y-4 border py-2 px-4 rounded">
+          <h2 className="text-lg">Price Range</h2>
+          <label htmlFor="price" className="flex flex-row gap-x-2 items-center">
+            <input
+              type="range"
+              name="price"
+              id="price"
+              min={10}
+              max={500}
+              className="flex-1 bg-secondary appearance-none h-1.5 rounded"
+            />
+            <p className="text-xs flex flex-row items-baseline">
+              $<span className="text-base">500.00</span>
+            </p>
+          </label>
+        </div>
+
+        {/* Date Range */}
+        <div className="flex flex-col gap-y-4 border py-2 px-4 rounded">
+          <h2 className="text-lg">Date Range</h2>
+          <label htmlFor="date" className="flex flex-row gap-x-2 items-center">
+            <input
+              type="date"
+              name="date"
+              id="date"
+              className="flex-1 !text-sm !p-0 !border-0"
+            />
+            <div className="h-4 border" />
+            <input
+              type="date"
+              name="date"
+              id="date"
+              className="flex-1 !text-sm !p-0 !border-0"
+            />
+          </label>
+        </div>
+
+        {/* Choose Rating */}
+        <div className="flex flex-col gap-y-4 border py-2 px-4 rounded">
+          <h2 className="text-lg">Choose Ratings</h2>
+          <div className="flex flex-col gap-y-2.5">
+            <label
+              htmlFor="five"
+              className="text-sm flex flex-row items-center gap-x-1.5"
+            >
+              <input
+                type="checkbox"
+                name="five"
+                id="five"
+                className="!rounded-secondary checked:bg-primary checked:text-primary"
+              />
+              <span className="flex flex-row gap-x-1 items-center">
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+              </span>
+            </label>
+            <label
+              htmlFor="four"
+              className="text-sm flex flex-row items-center gap-x-1.5"
+            >
+              <input
+                type="checkbox"
+                name="four"
+                id="four"
+                className="!rounded-secondary checked:bg-primary checked:text-primary"
+              />
+              <span className="flex flex-row gap-x-1 items-center">
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+              </span>
+            </label>
+            <label
+              htmlFor="three"
+              className="text-sm flex flex-row items-center gap-x-1.5"
+            >
+              <input
+                type="checkbox"
+                name="three"
+                id="three"
+                className="!rounded-secondary checked:bg-primary checked:text-primary"
+              />
+              <span className="flex flex-row gap-x-1 items-center">
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+              </span>
+            </label>
+            <label
+              htmlFor="two"
+              className="text-sm flex flex-row items-center gap-x-1.5"
+            >
+              <input
+                type="checkbox"
+                name="two"
+                id="two"
+                className="!rounded-secondary checked:bg-primary checked:text-primary"
+              />
+              <span className="flex flex-row gap-x-1 items-center">
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+              </span>
+            </label>
+            <label
+              htmlFor="one"
+              className="text-sm flex flex-row items-center gap-x-1.5"
+            >
+              <input
+                type="checkbox"
+                name="one"
+                id="one"
+                className="!rounded-secondary checked:bg-primary checked:text-primary"
+              />
+              <span className="flex flex-row gap-x-1 items-center">
+                <BiSolidStar className="text-yellow-500 h-4 w-4" />
+              </span>
+            </label>
+          </div>
+        </div>
+
+        {/* Choose Activity */}
+        <div className="flex flex-col gap-y-4 border py-2 px-4 rounded">
+          <h2 className="text-lg">Choose Activity</h2>
+          <div className="flex flex-col gap-y-2.5">
+            <label
+              htmlFor="beach"
+              className="text-sm flex flex-row items-center gap-x-1.5"
+            >
+              <input
+                type="checkbox"
+                name="beach"
+                id="beach"
+                className="!rounded-secondary checked:bg-primary checked:text-primary"
+              />
+              Beach
+            </label>
+            <label
+              htmlFor="club"
+              className="text-sm flex flex-row items-center gap-x-1.5"
+            >
+              <input
+                type="checkbox"
+                name="club"
+                id="club"
+                className="!rounded-secondary checked:bg-primary checked:text-primary"
+              />
+              Club
+            </label>
+            <label
+              htmlFor="cultural"
+              className="text-sm flex flex-row items-center gap-x-1.5"
+            >
+              <input
+                type="checkbox"
+                name="cultural"
+                id="cultural"
+                className="!rounded-secondary checked:bg-primary checked:text-primary"
+              />
+              Cultural
+            </label>
+            <label
+              htmlFor="tourism"
+              className="text-sm flex flex-row items-center gap-x-1.5"
+            >
+              <input
+                type="checkbox"
+                name="tourism"
+                id="tourism"
+                className="!rounded-secondary checked:bg-primary checked:text-primary"
+              />
+              Tourism
+            </label>
+          </div>
+        </div>
+      </section>
+    </aside>
+  );
+};
+
+export default FilterSidebar;
