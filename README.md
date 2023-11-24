@@ -35,7 +35,7 @@ With its modern design and intuitive layout, the Home Page welcomes users to an 
 - ORM: `Mongoose`
 - Linting: `ESLint`
 - Formatter: `Prettier`
-- Backend Directory: `Node.Js Express Server`
+- Backend Directory: `Serverless Server`
 
 ## Technologies
 
