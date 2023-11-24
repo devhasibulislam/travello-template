@@ -36,7 +36,7 @@ export default async function handler(req, res) {
             });
           }
 
-          authorization("seller")(req, res, async (err) => {
+          authorization("buyer")(req, res, async (err) => {
             if (err) {
               return res.send({
                 success: false,
