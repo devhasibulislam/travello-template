@@ -16,11 +16,13 @@
 import React from "react";
 import Search from "../searchTrio/Search";
 import LargeDevice from "./LargeDevice";
+import Cart from "../cart/Cart";
 
 const UserMenu = () => {
   return (
     <section className="lg:block hidden">
       <div className="flex flex-row items-center gap-x-4">
+        <Cart />
         <Search />
         <LargeDevice />
       </div>
