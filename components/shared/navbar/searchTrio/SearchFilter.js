@@ -16,6 +16,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { useGetRentsQuery } from "@/services/rent/rentApi";
+import { toast } from "react-hot-toast";
 
 const SearchFilter = ({ setIsModalOpen }) => {
   const router = useRouter();
@@ -24,28 +25,37 @@ const SearchFilter = ({ setIsModalOpen }) => {
   const tours = useMemo(() => data?.data || [], [data]);
 
   useEffect(() => {
-    if (error) {
-      console.log(error?.data?.message);
+    if (isLoading) {
+      toast.loading("Loading...", { id: "search" });
     }
-  }, [error]);
+
+    if (data) {
+      toast.success(data?.message, { id: "search" });
+    }
+
+    if (error?.data) {
+      toast.error(error?.data?.message, { id: "search" });
+    }
+  }, [data, error, isLoading]);
 
   const handleSearch = (event) => {
     setSearchTerm(event?.target?.value?.toLowerCase());
   };
 
-  const filteredTravels = searchTerm?.length
-    ? tours.filter(({ title, description, country }) => {
-        const lowerTitle = title?.toLowerCase();
-        const lowerDescription = description?.toLowerCase();
-        const lowerCountry = country?.toLowerCase();
+  const filteredTravels =
+    searchTerm?.length > 0
+      ? tours.filter(({ title, summary, location }) => {
+          const lowerTitle = title?.toLowerCase();
+          const lowerDescription = summary?.toLowerCase();
+          const lowerCountry = location?.toLowerCase();
 
-        return (
-          lowerTitle?.includes(searchTerm) ||
-          lowerDescription?.includes(searchTerm) ||
-          lowerCountry?.includes(searchTerm)
-        );
-      })
-    : tours;
+          return (
+            lowerTitle?.includes(searchTerm) ||
+            lowerDescription?.includes(searchTerm) ||
+            lowerCountry?.includes(searchTerm)
+          );
+        })
+      : tours;
 
   const highlightMatch = (text, keyword) => {
     if (!keyword) {
@@ -83,18 +93,16 @@ const SearchFilter = ({ setIsModalOpen }) => {
         />
 
         <div className="flex flex-col gap-y-2.5 max-h-96 overflow-y-auto">
-          {isLoading || filteredTravels.length === 0 ? (
-            <p className="text-sm text-red-500">
-              No matching destinations found.
-            </p>
+          {filteredTravels.length === 0 ? (
+            <p className="text-sm text-red-500">No rents found!</p>
           ) : (
-            filteredTravels.map(({ _id, title, description, country }) => {
+            filteredTravels.map(({ _id, title, summary, location, price }) => {
               const highlightedTitle = highlightMatch(title, searchTerm);
               const highlightedDescription = highlightMatch(
-                description,
+                summary,
                 searchTerm
               );
-              const highlightedCountry = highlightMatch(country, searchTerm);
+              const highlightedCountry = highlightMatch(location, searchTerm);
 
               return (
                 <article
@@ -111,17 +119,20 @@ const SearchFilter = ({ setIsModalOpen }) => {
                   }}
                 >
                   <h2
-                    className="!font-normal text-sm"
+                    className="!font-normal text-base line-clamp-1"
                     dangerouslySetInnerHTML={{ __html: highlightedTitle }}
                   />
                   <p
-                    className="line-clamp-3 text-xs"
+                    className="line-clamp-2 text-sm"
                     dangerouslySetInnerHTML={{ __html: highlightedDescription }}
                   />
-                  <span
-                    className="text-end text-[10px] text-gray-500 line-clamp-1"
-                    dangerouslySetInnerHTML={{ __html: highlightedCountry }}
-                  />
+                  <p className="flex flex-row gap-x-2 mt-1">
+                    <span className="text-xs border border-cyan-900 px-2 rounded">${price}/night</span>
+                    <span
+                      className="text-end text-xs text-gray-500 line-clamp-1 border border-teal-900 px-2 rounded"
+                      dangerouslySetInnerHTML={{ __html: highlightedCountry }}
+                    />
+                  </p>
                 </article>
               );
             })

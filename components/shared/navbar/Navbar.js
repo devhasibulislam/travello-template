@@ -16,9 +16,7 @@
 import React from "react";
 import Logo from "../logo/Logo";
 import Container from "../container/Container";
-import TravelMenu from "./travelMenu/TravelMenu";
 import UserMenu from "./userMenu/UserMenu";
-import MobileMenu from "./mobileMenu/MobileMenu";
 
 const Navbar = () => {
   return (
@@ -27,9 +25,7 @@ const Navbar = () => {
         <nav className="py-4">
           <section className="flex flex-row justify-between items-center">
             <Logo />
-            <TravelMenu />
             <UserMenu />
-            <MobileMenu />
           </section>
         </nav>
       </Container>

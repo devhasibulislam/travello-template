@@ -42,7 +42,7 @@ const Search = () => {
         </button>
       </Tooltip>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal} className="w-1/3 z-50">
+      <Modal isOpen={isModalOpen} onClose={closeModal} className="!w-1/3 z-50">
         <div className="flex flex-col gap-y-4">
           <h1 className="text-2xl drop-shadow">
             Search Your <HighlightText>Destination</HighlightText>

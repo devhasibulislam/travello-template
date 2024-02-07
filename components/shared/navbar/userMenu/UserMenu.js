@@ -15,16 +15,18 @@
 
 import React from "react";
 import Search from "../searchTrio/Search";
-import LargeDevice from "./LargeDevice";
 import Cart from "../cart/Cart";
+import Favorites from "../favorites/Favorites";
+import MobileMenu from "../mobileMenu/MobileMenu";
 
 const UserMenu = () => {
   return (
     <section className="lg:block hidden">
       <div className="flex flex-row items-center gap-x-4">
-        <Cart />
         <Search />
-        <LargeDevice />
+        <Favorites />
+        <Cart />
+        <MobileMenu />
       </div>
     </section>
   );
