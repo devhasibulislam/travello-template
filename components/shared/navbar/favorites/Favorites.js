@@ -1,5 +1,5 @@
 /**
- * Title: Write a program using JavaScript on Cart
+ * Title: Write a program using JavaScript on Favorites
  * Author: Hasibul Islam
  * Portfolio: https://devhasibulislam.vercel.app
  * Linkedin: https://linkedin.com/in/devhasibulislam
@@ -10,7 +10,7 @@
  * Pinterest: https://pinterest.com/devhasibulislam
  * WhatsApp: https://wa.me/8801906315901
  * Telegram: devhasibulislam
- * Date: 25, November 2023
+ * Date: 04, February 2024
  */
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -20,45 +20,51 @@ import Modal from "../../modal/Modal";
 import HighlightText from "../../highlightText/HighlightText";
 import CartCard from "../../loading/cartCard";
 import Image from "next/image";
-import {
-  useGetCartQuery,
-  useRemoveFromCartMutation,
-} from "@/services/cart/cartApi";
+import { useGetCartQuery } from "@/services/cart/cartApi";
 import { useSelector } from "react-redux";
+import { MdFavoriteBorder } from "react-icons/md";
+import LoadImage from "../../image/LoadImage";
+import { useDeleteFromFavoriteMutation } from "@/services/favorite/favoriteApi";
+import { FiTrash } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { FiTrash } from "react-icons/fi";
 
-const Cart = () => {
+const Favorites = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const user = useSelector((state) => state?.auth);
 
   const [
-    removeFromCart,
+    deleteFromFavorite,
     {
-      isLoading: removeFromCartLoading,
-      data: removeFromCartData,
-      error: removeFromCartError,
+      isLoading: deleteFromFavoriteLoading,
+      data: deleteFromFavoriteData,
+      error: deleteFromFavoriteError,
     },
-  ] = useRemoveFromCartMutation();
+  ] = useDeleteFromFavoriteMutation();
 
   useEffect(() => {
-    if (removeFromCartLoading) {
-      toast.loading("Removing from cart...", { id: "remove-from-cart" });
-    }
-
-    if (removeFromCartData) {
-      toast.success(removeFromCartData?.message, {
-        id: "remove-from-cart",
+    if (deleteFromFavoriteLoading) {
+      toast.loading("Removing from favorite...", {
+        id: "remove-from-favorite",
       });
     }
 
-    if (removeFromCartError?.data) {
-      toast.error(removeFromCartError?.data?.message, {
-        id: "remove-from-cart",
+    if (deleteFromFavoriteData) {
+      toast.success(deleteFromFavoriteData?.message, {
+        id: "remove-from-favorite",
       });
     }
-  }, [removeFromCartLoading, removeFromCartData, removeFromCartError]);
+
+    if (deleteFromFavoriteError?.data) {
+      toast.error(deleteFromFavoriteError?.data?.message, {
+        id: "remove-from-favorite",
+      });
+    }
+  }, [
+    deleteFromFavoriteError,
+    deleteFromFavoriteData,
+    deleteFromFavoriteLoading,
+  ]);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -70,16 +76,16 @@ const Cart = () => {
 
   return (
     <>
-      <Tooltip text="Cart">
+      <Tooltip text="Favorites">
         <button
           className="p-1.5 border border-primary/20 hover:border-primary rounded relative"
           onClick={openModal}
         >
-          <IoCartOutline className="text-lg" />
+          <MdFavoriteBorder className="text-lg" />
 
           <span
             className={`h-2 w-2 rounded-secondary absolute -top-1 -right-1 ${
-              user?.cart?.rents?.length > 0 && "bg-green-500"
+              user?.favorite?.rents?.length > 0 && "bg-green-500"
             }`}
           ></span>
         </button>
@@ -92,25 +98,30 @@ const Cart = () => {
       >
         <div className="flex flex-col gap-y-4">
           <h1 className="text-2xl drop-shadow">
-            Check Your <HighlightText>Cart</HighlightText>
+            Check Your <HighlightText>Favorites</HighlightText>
           </h1>
           <section className="h-full w-full">
-            {user?.cart?.rents?.length === 0 ? (
+            {user?.favorite?.rents?.length === 0 ? (
               <p className="text-sm text-red-500">No rents found!</p>
             ) : (
               <section className="grid grid-cols-2 gap-4">
-                {user?.cart?.rents?.map((rent) => (
+                {user?.favorite?.rents?.map((rent) => (
                   <div
                     key={rent?._id}
                     className="flex flex-col gap-y-2.5 border p-4 rounded relative"
                   >
-                    <Image
-                      src={rent?.gallery[0].url}
-                      alt={rent?.gallery[0]?.public_id}
-                      width={100}
-                      height={50}
-                      className="object-cover rounded"
-                    />
+                    <span className="flex -space-x-4">
+                      {rent?.gallery?.map((gallery) => (
+                        <LoadImage
+                          key={gallery?._id}
+                          src={gallery?.url}
+                          alt={gallery?.public_id}
+                          height={30}
+                          width={30}
+                          className="h-[30px] w-[30px] rounded-secondary border border-primary object-cover"
+                        />
+                      ))}
+                    </span>
 
                     <article className="flex flex-col gap-y-2">
                       <div className="">
@@ -137,9 +148,9 @@ const Cart = () => {
                     <button
                       type="button"
                       className="absolute top-2 right-2 p-1 rounded-secondary bg-red-500 !text-white"
-                      onClick={() => removeFromCart(rent?._id)}
+                      onClick={() => deleteFromFavorite(rent?._id)}
                     >
-                      {removeFromCartLoading ? (
+                      {deleteFromFavoriteLoading ? (
                         <AiOutlineLoading3Quarters className="animate-spin" />
                       ) : (
                         <FiTrash className="w-5 h-5" />
@@ -156,4 +167,4 @@ const Cart = () => {
   );
 };
 
-export default Cart;
+export default Favorites;
