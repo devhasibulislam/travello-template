@@ -1,5 +1,5 @@
 /**
- * Title: Write a program using JavaScript on CartApi
+ * Title: Write a program using JavaScript on PaymentApi
  * Author: Hasibul Islam
  * Portfolio: https://devhasibulislam.vercel.app
  * Linkedin: https://linkedin.com/in/devhasibulislam
@@ -10,54 +10,38 @@
  * Pinterest: https://pinterest.com/devhasibulislam
  * WhatsApp: https://wa.me/8801906315901
  * Telegram: devhasibulislam
- * Date: 19, November 2023
+ * Date: 06, February 2024
  */
 
 const { travelloApi } = require("../travello");
 
-const cartApi = travelloApi.injectEndpoints({
-  endpoints: (builder) => ({
-    // add to cart
-    addToCart: builder.mutation({
+const paymentApi = travelloApi.injectEndpoints({
+  endpoints: (build) => ({
+    // create payment intent
+    createPaymentIntent: build.mutation({
       query: (body) => ({
-        url: "/cart/",
+        url: "/payment/create-intent",
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         body,
       }),
-
-      invalidatesTags: ["Cart", "User"],
     }),
 
-    // get cart
-    getCart: builder.query({
-      query: () => ({
-        url: "/cart/",
-        method: "GET",
-      }),
-
-      providesTags: ["Cart"],
-    }),
-
-    // remove from cart
-    removeFromCart: builder.mutation({
-      query: (id) => ({
-        url: `/cart/${id}`,
-        method: "DELETE",
+    // integrate payment to purchase
+    integratePurchase: build.mutation({
+      query: (body) => ({
+        url: "/purchase/",
+        method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
+        body,
       }),
-
-      invalidatesTags: ["Cart", "User"],
     }),
   }),
 });
 
-export const {
-  useAddToCartMutation,
-  useGetCartQuery,
-  useRemoveFromCartMutation,
-} = cartApi;
+export const { useCreatePaymentIntentMutation, useIntegratePurchaseMutation } =
+  paymentApi;

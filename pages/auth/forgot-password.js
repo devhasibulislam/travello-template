@@ -20,6 +20,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
 const ForgotPassword = () => {
   const { register, handleSubmit, reset } = useForm();
@@ -29,14 +30,15 @@ const ForgotPassword = () => {
 
   useEffect(() => {
     if (data) {
-      alert(data?.message);
-      router.push("/auth/signin");
+      toast.success(data?.message, { id: "forgot-password" });
+      window.open("/auth/signin", "_self");
+      reset();
     }
     if (error?.data) {
-      alert(error?.data?.message);
+      toast.error(error?.data?.message, { id: "forgot-password" });
     }
     if (isLoading) {
-      reset();
+      toast.loading("Resetting password...", { id: "forgot-password" });
     }
   }, [data, error, isLoading, reset, router]);
 
@@ -80,7 +82,7 @@ const ForgotPassword = () => {
             />
           </label>
           <Button type="submit" disabled={isLoading} className="py-2">
-            {isLoading ? "Loading..." : "Reset Password"}
+            Reset Password
           </Button>
         </form>
         <div className="text-xs flex flex-row justify-center items-center gap-x-2">

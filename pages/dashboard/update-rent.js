@@ -13,14 +13,11 @@
  * Date: 16, November 2023
  */
 
-import Panel from "@/components/sidebar/Panel";
 import hotelTypes from "@/data/hotelTypes";
 import useGetCountries from "@/hooks/useGetCountries";
 import React, { useEffect, useMemo, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { FiPlus } from "react-icons/fi";
-import { HiOutlineMinus } from "react-icons/hi";
-import { GrCloudUpload } from "react-icons/gr";
 import Button from "@/components/shared/button/Button";
 import LoadImage from "@/components/shared/image/LoadImage";
 import { useRouter } from "next/router";
@@ -28,10 +25,15 @@ import {
   useGetRentQuery,
   useUpdateRentMutation,
 } from "@/services/rent/rentApi";
+import Panel from "@/layouts/Panel";
+import { toast } from "react-hot-toast";
+import dynamic from "next/dynamic";
+import { CgTrash } from "react-icons/cg";
+import { IoCloudUploadOutline } from "react-icons/io5";
 
 const UpdateRent = () => {
+  const [country, setCountry] = useState("Bangladesh");
   const { query } = useRouter();
-  const countries = useGetCountries();
   const {
     data: rentData,
     isLoading: rentFetching,
@@ -44,13 +46,26 @@ const UpdateRent = () => {
   const rent = useMemo(() => rentData?.data || [], [rentData]);
 
   useEffect(() => {
+    if (rentUpdating) {
+      toast.loading("Updating rent...", { id: "update-rent" });
+    }
+
     if (rentUpdateData) {
-      alert(rentUpdateData?.message);
+      toast.success(rentUpdateData?.message, { id: "update-rent" });
     }
-    if (rentUpdateError?.data || rentError?.data) {
-      alert(rentUpdateError?.data?.message || rentError?.data?.message);
+
+    if (rentUpdateError?.data) {
+      toast.error(rentUpdateError?.data?.message, { id: "update-rent" });
     }
-  }, [rentUpdateData, rentUpdateError, rentError]);
+
+    if (rentData) {
+      toast.success(rentData?.message, { id: "fetch-rent" });
+    }
+
+    if (rentError) {
+      toast.error(rentError?.data?.message, { id: "fetch-rent" });
+    }
+  }, [rentUpdating, rentUpdateData, rentUpdateError, rentError]);
 
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -63,17 +78,20 @@ const UpdateRent = () => {
   const defaultValues = useMemo(() => {
     return {
       title: rent?.title || "",
-      description: rent?.description || "",
-      gallery: rent?.gallery || [],
+      summary: rent?.summary || "",
       price: rent?.price || "",
       gallery: rent?.gallery || [],
       members: rent?.members || 1,
-      startDate: formatDate(rent?.duration?.startDate) || "",
-      endDate: formatDate(rent?.duration?.endDate) || "",
+      duration: {
+        startDate: formatDate(rent?.duration?.startDate) || "",
+        endDate: formatDate(rent?.duration?.endDate) || "",
+      },
       location: rent?.location || "",
       type: rent?.type || "",
-      informationArray: rent?.informationArray || [{ information: "" }],
-      timeArray: rent?.timeArray || [{ time: "" }],
+      information: rent?.information?.map((item) => ({
+        information: item,
+      })) || [{ information: "" }],
+      times: rent?.times?.map((item) => ({ times: item })) || [{ times: "" }],
     };
   }, [rent]);
 
@@ -82,8 +100,9 @@ const UpdateRent = () => {
 
   useEffect(() => {
     reset(defaultValues);
+    setCountry(defaultValues?.location || "Bangladesh");
     setGalleryPreview(defaultValues?.gallery || []);
-  }, [defaultValues, reset, setGalleryPreview]);
+  }, [defaultValues, reset]);
 
   const handleSetGalleryPreview = (event) => {
     const files = event.target.files;
@@ -116,18 +135,31 @@ const UpdateRent = () => {
     remove: informationRemove,
   } = useFieldArray({
     control,
-    name: "informationArray",
+    name: "information",
   });
   const {
-    fields: timeFields,
-    append: timeAppend,
-    remove: timeRemove,
+    fields: timesFields,
+    append: timesAppend,
+    remove: timesRemove,
   } = useFieldArray({
     control,
-    name: "timeArray",
+    name: "times",
   });
 
+  const countries = useGetCountries();
+  const GeoLocation = useMemo(
+    () =>
+      dynamic(() => import("@/components/detail/GeoLocation"), {
+        loading: () => <p className="font-sans">Map is loading...</p>,
+        ssr: false,
+      }),
+    []
+  );
+
   const handleAddRent = (data) => {
+    const times = data.times.map((t) => t.times);
+    const information = data.information.map((i) => i.information);
+
     const formData = new FormData();
 
     formData.append("title", data?.title);
@@ -137,341 +169,285 @@ const UpdateRent = () => {
     formData.append("location", data?.location);
     formData.append("type", data?.type);
 
-    data?.informationArray.forEach((field) => {
-      formData.append(
-        "informationArray",
-        JSON.stringify({ information: field?.information })
-      );
-    });
-
-    data?.timeArray.forEach((field) => {
-      formData.append("timeArray", JSON.stringify({ time: field?.time }));
-    });
-
-    if (
-      Array.isArray(galleryPreview) &&
-      galleryPreview.every((item) => typeof item === "string")
-    ) {
-      for (let i = 0; i < data?.gallery.length; i++) {
-        formData.append("gallery", data?.gallery[i]);
-      }
-
-      for (let i = 0; i < defaultValues?.gallery.length; i++) {
-        formData.append("oldGallery", defaultValues?.gallery[i]?.public_id);
-      }
+    for (let i = 0; i < information.length; i++) {
+      formData.append("information", information[i]);
     }
 
-    formData.append(
-      "duration",
-      JSON.stringify({
-        startDate: data?.startDate,
-        endDate: data?.endDate,
-      })
-    );
+    for (let i = 0; i < times.length; i++) {
+      formData.append("times", times[i]);
+    }
+
+    if (Array.isArray(data.gallery) === false) {
+      for (let i = 0; i < data.gallery.length; i++) {
+        formData.append("gallery", data.gallery[i]);
+      }
+    } 
+
+    formData.append("duration", JSON.stringify(data.duration));
 
     updateRent({
-      id: query?.id,
+      id: rent?._id,
       body: formData,
     });
   };
 
   return (
     <Panel>
-      <section className="h-full">
-        {rentFetching ? (
-          <div className="grid grid-cols-12 lg:gap-x-6 gap-4">
-            <div className="lg:col-span-5 col-span-12">
-              <div className="w-full h-96 bg-gray-200 animate-pulse rounded" />
+      {rentFetching ? (
+        <div className="lg:w-1/2 md:w-3/4 w-full h-full flex flex-col gap-y-6">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+            <div key={i} className="flex flex-col gap-y-3">
+              <div className="w-1/2 h-4 rounded bg-gray-200 animate-pulse" />
+              <div className="w-full h-6 rounded-secondary bg-gray-200 animate-pulse" />
             </div>
-            <div className="lg:col-span-7 col-span-12 flex flex-col gap-y-6">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-                <div key={i} className="flex flex-col gap-y-3">
-                  <div className="w-1/2 h-4 rounded bg-gray-200 animate-pulse" />
-                  <div className="w-full h-6 rounded-secondary bg-gray-200 animate-pulse" />
-                </div>
+          ))}
+        </div>
+      ) : (
+        <form
+          action=""
+          className="text-sm lg:w-1/2 md:w-3/4 w-full h-full flex flex-col gap-y-4"
+          onSubmit={handleSubmit(handleAddRent)}
+        >
+          {/* gallery */}
+          <div className="flex flex-col gap-y-2">
+            <div className="flex flex-row overflow-x-auto gap-x-2">
+              {galleryPreview?.map((image, index) => (
+                <LoadImage
+                  key={index}
+                  src={image?.url ? image?.url : image}
+                  alt={image?.public_id || "gallery"}
+                  height={100}
+                  width={100}
+                  className="h-[100px] w-[100px] rounded object-cover"
+                />
               ))}
             </div>
+            <label htmlFor="gallery" className="relative">
+              <button
+                type="button"
+                className="py-1 px-4 flex flex-row gap-x-2 bg-green-100 border border-green-900 text-green-900 rounded-secondary w-fit"
+              >
+                <IoCloudUploadOutline className="h-5 w-5" />
+                Choose upto 5 photos*
+              </button>
+              <input
+                type="file"
+                name="gallery"
+                id="gallery"
+                accept="image/png, image/jpg, image/jpeg"
+                className="absolute top-0 left-0 h-full w-full opacity-0 cursor-pointer"
+                multiple
+                {...register("gallery", {
+                  onChange: (event) => handleSetGalleryPreview(event),
+                })}
+              />
+            </label>
           </div>
-        ) : (
-          <form
-            className="grid grid-cols-12 lg:gap-x-6 gap-4 relative"
-            onSubmit={handleSubmit(handleAddRent)}
-          >
-            {/* rent gallery */}
-            <div className="lg:col-span-5 col-span-12">
-              <div className="grid grid-cols-12 gap-y-2 gap-x-4 relative">
-                {galleryPreview?.map((image, index) => (
-                  <LoadImage
-                    key={index}
-                    src={image?.url || image}
-                    alt={image?.public_id || index}
-                    height={512}
-                    width={364}
-                    className={
-                      "h-[200px] w-full rounded object-cover" +
-                      (galleryPreview?.length === 1
-                        ? " col-span-12"
-                        : galleryPreview?.length === 2
-                        ? " col-span-12"
-                        : galleryPreview?.length === 3
-                        ? index === 0
-                          ? " col-span-12"
-                          : " col-span-6"
-                        : galleryPreview?.length === 4
-                        ? index === 0 || index === 1
-                          ? " col-span-12"
-                          : " col-span-6"
-                        : galleryPreview?.length === 5 && index === 0
-                        ? " col-span-12"
-                        : " col-span-6")
-                    }
-                  />
-                ))}
 
-                <div className="absolute top-0 left-0 w-full h-full bg-black/70 z-50 rounded flex justify-center items-center">
-                  <input
-                    type="file"
-                    name="gallery"
-                    id="gallery"
-                    multiple
-                    accept="image/png, image/jpg, image/jpeg"
-                    {...register("gallery", {
-                      onChange: (event) => handleSetGalleryPreview(event),
-                    })}
-                    className="absolute top-0 left-0 w-full h-full cursor-pointer opacity-0"
-                  />
-                  <span className="flex flex-col gap-y-2 items-center">
-                    <span className="p-4 rounded-secondary border !border-white !text-white">
-                      <GrCloudUpload className="h-10 w-10 !text-white" />
-                    </span>
-                    <span className="text-sm text-center text-white">
-                      Upload Gallery <br /> upto <b>5</b> Images
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
+          {/* title */}
+          <label htmlFor="title" className="flex flex-col gap-y-2">
+            Rent Title*
+            <input
+              type="text"
+              name="title"
+              id="title"
+              maxLength={100}
+              placeholder="Type rent title here..."
+              className="rounded"
+              {...register("title")}
+              maxlength="100"
+            />
+          </label>
 
-            {/* rent form */}
-            <div className="lg:col-span-7 col-span-12 flex flex-col gap-y-4">
-              {/* rent title */}
-              <label htmlFor="title" className="flex flex-col gap-y-2">
-                <span className="text-sm">Rent Title*</span>
-                <input
-                  type="text"
-                  name="title"
-                  id="title"
-                  {...register("title")}
-                  placeholder="Type rent title here..."
-                  className="!rounded"
-                />
-              </label>
+          {/* summary */}
+          <label htmlFor="summary" className="flex flex-col gap-y-2">
+            Rent Summary*
+            <textarea
+              name="summary"
+              id="summary"
+              rows="5"
+              maxLength={500}
+              placeholder="Type rent summary here..."
+              className="rounded"
+              {...register("summary")}
+              maxlength="500"
+            ></textarea>
+          </label>
 
-              {/* rent description */}
-              <label htmlFor="description" className="flex flex-col gap-y-2">
-                <span className="text-sm">Rent Description*</span>
-                <textarea
-                  name="description"
-                  id="description"
-                  rows="5"
-                  {...register("description")}
-                  placeholder="Type rent description here..."
-                  className="!rounded"
-                ></textarea>
-              </label>
+          {/* price */}
+          <label htmlFor="price" className="flex flex-col gap-y-2">
+            Rent Price*
+            <input
+              type="number"
+              name="price"
+              id="price"
+              placeholder="Type rent price here..."
+              className="rounded"
+              {...register("price")}
+            />
+          </label>
 
-              {/* rent price */}
-              <label htmlFor="price" className="flex flex-col gap-y-2 flex-1">
-                <span className="text-sm">Rent Price*</span>
-                <input
-                  type="number"
-                  name="price"
-                  id="price"
-                  {...register("price")}
-                  placeholder="Type rent price here..."
-                  className="!rounded"
-                />
-              </label>
+          {/* members */}
+          <label htmlFor="members" className="flex flex-col gap-y-2">
+            Number of Members*
+            <input
+              type="number"
+              name="members"
+              id="members"
+              placeholder="Type rent members here..."
+              className="rounded"
+              {...register("members")}
+            />
+          </label>
 
-              {/* number of members */}
-              <label htmlFor="members" className="flex flex-col gap-y-2 flex-1">
-                <span className="text-sm">Number of Members*</span>
-                <input
-                  type="number"
-                  name="members"
-                  id="members"
-                  {...register("members")}
-                  placeholder="Type rent members here..."
-                  className="!rounded"
-                />
-              </label>
+          {/* duration */}
+          <div className="flex md:flex-row flex-col gap-4 w-full">
+            {/* start date */}
+            <label htmlFor="startDate" className="flex flex-col gap-y-2 w-full">
+              Rent Start Date*
+              <input
+                type="date"
+                name="startDate"
+                id="startDate"
+                className="rounded"
+                {...register("duration.startDate")}
+              />
+            </label>
 
-              {/* rent duration */}
-              <p className="flex lg:flex-row flex-col gap-4">
-                {/* start date */}
-                <label
-                  htmlFor="startDate"
-                  className="flex flex-col gap-y-2 flex-1"
-                >
-                  <span className="text-sm !text-white">Rent Start Date*</span>
-                  <input
-                    type="date"
-                    name="startDate"
-                    id="startDate"
-                    {...register("startDate")}
-                    className="!rounded text-white"
-                  />
-                </label>
+            {/* end date */}
+            <label htmlFor="endDate" className="flex flex-col gap-y-2 w-full">
+              Rent End Date*
+              <input
+                type="date"
+                name="endDate"
+                id="endDate"
+                className="rounded"
+                {...register("duration.endDate")}
+              />
+            </label>
+          </div>
 
-                {/* end date */}
-                <label
-                  htmlFor="startDate"
-                  className="flex flex-col gap-y-2 flex-1"
-                >
-                  <span className="text-sm !text-white">Rent End Date*</span>
-                  <input
-                    type="date"
-                    name="endDate"
-                    id="endDate"
-                    {...register("endDate")}
-                    className="!rounded text-white"
-                  />
-                </label>
-              </p>
+          {/* type */}
+          <label htmlFor="type" className="flex flex-col gap-y-2">
+            Choose Rent Type*
+            <select
+              name="type"
+              id="type"
+              className="rounded"
+              {...register("type")}
+            >
+              {hotelTypes?.map(({ name }, index) => (
+                <option key={index} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </label>
 
-              {/* rent location */}
-              <label
-                htmlFor="location"
-                className="flex flex-col gap-y-2 flex-1"
+          {/* location */}
+          <div className="flex flex-col gap-y-4">
+            <label htmlFor="location" className="flex flex-col gap-y-2">
+              Choose Location*
+              <select
+                name="location"
+                id="location"
+                className="rounded"
+                {...register("location", {
+                  onChange: (e) => setCountry(e.target.value),
+                })}
               >
-                <span className="text-sm">Choose Location*</span>
-                {countries?.length === 0 ? (
-                  <>Loading...</>
-                ) : (
-                  <select
-                    name="location"
-                    id="location"
-                    {...register("location")}
-                    className=""
-                  >
-                    {countries?.map((country, index) => (
-                      <option key={index} value={country?.name?.toLowerCase()}>
-                        {country?.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </label>
+                <option selected disabled>
+                  {country}
+                </option>
+                {countries?.map((country, index) => (
+                  <option key={index} value={country?.name}>
+                    {country?.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <GeoLocation location={country} zoom={10} height="200px" />
+          </div>
 
-              {/* rent types */}
-              <label htmlFor="type" className="flex flex-col gap-y-2 flex-1">
-                <span className="text-sm">Choose Rent Type*</span>
-                {countries?.length === 0 ? (
-                  <>Loading...</>
-                ) : (
-                  <select
-                    name="type"
-                    id="type"
-                    {...register("type")}
-                    className=""
-                  >
-                    {hotelTypes?.map((type, index) => (
-                      <option key={index} value={type?.name?.toLowerCase()}>
-                        {type?.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </label>
-
-              {/* important information */}
-              <label htmlFor="information" className="flex flex-col gap-y-2">
-                <span className="text-sm flex flex-row justify-between items-center">
-                  Rent Feature Information*{" "}
+          {/* information */}
+          <label htmlFor="information" className="flex flex-col gap-y-2">
+            Additional Information*
+            <p className="flex flex-col gap-y-2">
+              {informationFields.map((field, index) => (
+                <span
+                  key={field.id}
+                  className="flex flex-row gap-x-2 items-center"
+                >
+                  <input
+                    type="text"
+                    name={`information[${index}].information`}
+                    id="information"
+                    className="w-full rounded"
+                    placeholder="Type information here..."
+                    {...register(`information.${index}.information`)}
+                    maxlength="100"
+                  />
                   <button
                     type="button"
-                    onClick={() => informationAppend({ information: "" })}
-                    className="p-0.5 border rounded-secondary bg-green-500 !text-black"
+                    className="bg-red-100 border border-red-900 text-red-900 p-0.5 rounded-secondary"
+                    onClick={() => informationRemove(index)}
                   >
-                    <FiPlus className="w-4 h-4" />
+                    <CgTrash className="w-4 h-4" />
                   </button>
                 </span>
-                {informationFields.map((field, index) => (
-                  <div
-                    key={field.id}
-                    className="flex flex-row gap-x-2 items-center"
-                  >
-                    <input
-                      type="text"
-                      name={`informationArray[${index}].information`}
-                      {...register(`informationArray[${index}].information`, {
-                        required: true,
-                      })}
-                      placeholder="Type one-line information here..."
-                      className="!rounded flex-1"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => informationRemove(index)}
-                      className="p-0.5 border rounded-secondary bg-red-500 !text-black"
-                    >
-                      <HiOutlineMinus className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </label>
+              ))}
+              <button
+                type="button"
+                className="bg-green-100 border border-green-900 text-green-900 py-1 rounded-secondary flex flex-row gap-x-1 items-center px-2 w-fit text-xs"
+                onClick={() => informationAppend({ information: "" })}
+              >
+                <FiPlus className="w-4 h-4" /> Add information*
+              </button>
+            </p>
+          </label>
 
-              {/* open time */}
-              <label htmlFor="time" className="flex flex-col gap-y-2">
-                <span className="text-sm flex flex-row justify-between items-center">
-                  Rent Open Time Information*{" "}
+          {/* times */}
+          <label htmlFor="times" className="flex flex-col gap-y-2">
+            Additional Times
+            <p className="flex flex-col gap-y-2">
+              {timesFields.map((field, index) => (
+                <span
+                  key={field.id}
+                  className="flex flex-row gap-x-2 items-center"
+                >
+                  <input
+                    type="text"
+                    name={`times[${index}].times`}
+                    id="times"
+                    className="w-full rounded"
+                    placeholder="Type times here..."
+                    {...register(`times.${index}.times`)}
+                    maxlength="100"
+                  />
                   <button
                     type="button"
-                    onClick={() => timeAppend({ time: "" })}
-                    className="p-0.5 border rounded-secondary bg-green-500 !text-black"
+                    className="bg-red-100 border border-red-900 text-red-900 p-0.5 rounded-secondary"
+                    onClick={() => timesRemove(index)}
                   >
-                    <FiPlus className="w-4 h-4" />
+                    <CgTrash className="w-4 h-4" />
                   </button>
                 </span>
-                {timeFields.map((field, index) => (
-                  <div
-                    key={field.id}
-                    className="flex flex-row gap-x-2 items-center"
-                  >
-                    <input
-                      type="text"
-                      name={`timeArray[${index}].time`}
-                      {...register(`timeArray[${index}].time`, {
-                        required: true,
-                      })}
-                      placeholder="Type open time information here..."
-                      className="!rounded flex-1"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => timeRemove(index)}
-                      className="p-0.5 border rounded-secondary bg-red-500 !text-black"
-                    >
-                      <HiOutlineMinus className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </label>
-            </div>
-
-            <div className="col-span-12 grid grid-cols-12">
-              <div className="lg:col-span-5" />
-              <Button
-                type="submit"
-                disabled={rentUpdating}
-                className="lg:col-span-7 col-span-12 py-2"
+              ))}
+              <button
+                type="button"
+                className="bg-green-100 border border-green-900 text-green-900 py-1 rounded-secondary flex flex-row gap-x-1 items-center px-2 w-fit text-xs"
+                onClick={() => timesAppend({ times: "" })}
               >
-                {rentUpdating ? "Loading..." : "Update Rent"}
-              </Button>
-            </div>
-          </form>
-        )}
-      </section>
+                <FiPlus className="w-4 h-4" /> Add Time*
+              </button>
+            </p>
+          </label>
+
+          <Button type="submit" className="py-2 mt-4">
+            Create Rent
+          </Button>
+        </form>
+      )}
     </Panel>
   );
 };

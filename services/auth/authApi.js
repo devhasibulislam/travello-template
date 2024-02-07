@@ -47,7 +47,7 @@ const authApi = travelloApi.injectEndpoints({
     }),
 
     // persist user
-    getUser: builder.query({
+    persistUser: builder.query({
       query: () => ({
         url: "/auth/me",
         method: "GET",
@@ -56,7 +56,7 @@ const authApi = travelloApi.injectEndpoints({
         },
       }),
 
-      providesTags: ["User"],
+      providesTags: ["User", "Cart", "Rent", "Favorite", "Purchase", "Review"],
     }),
   }),
 });
@@ -65,5 +65,5 @@ export const {
   useSignupMutation,
   useSigninMutation,
   useForgotPasswordMutation,
-  useGetUserQuery,
+  usePersistUserQuery,
 } = authApi;

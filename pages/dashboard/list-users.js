@@ -13,21 +13,21 @@
  * Date: 16, November 2023
  */
 
-import Panel from "@/components/sidebar/Panel";
 import LoadImage from "@/components/shared/image/LoadImage";
 import Table from "@/components/shared/loading/Table";
 import { useGetUsersQuery } from "@/services/user/userApi";
 import React, { useEffect, useState } from "react";
 import { FiEdit3 } from "react-icons/fi";
-import InactiveUser from "@/components/dashboard/InactiveUser";
 import Modal from "@/components/shared/modal/Modal";
 import UpdateUser from "@/components/dashboard/UpdateUser";
 import { useMemo } from "react";
 import { useDispatch } from "react-redux";
-import { addUser } from "@/features/auth/authSlice";
+import Panel from "@/layouts/Panel";
+import { setUser } from "@/features/user/userSlice";
+import DeleteUser from "@/components/dashboard/DeleteUser";
 
 const ListUsers = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const { data, isLoading, error } = useGetUsersQuery();
   const users = useMemo(() => data?.data || [], [data]);
   const dispatch = useDispatch();
@@ -116,11 +116,7 @@ const ListUsers = () => {
                         scope="row"
                         className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                       >
-                        <span className="text-sm">
-                          {user?.rents?.length < 10
-                            ? `0${user?.rents?.length}`
-                            : user?.rents?.length}
-                        </span>
+                        <span className="text-sm">{user?.rents?.length}</span>
                       </td>
                       <td
                         scope="row"
@@ -153,14 +149,14 @@ const ListUsers = () => {
                             type="button"
                             className="p-1 rounded-secondary bg-primary !text-white"
                             onClick={() => {
-                              setIsModalOpen(true);
-                              dispatch(addUser(user));
+                              setIsOpen(true);
+                              dispatch(setUser(user));
                             }}
                           >
                             <FiEdit3 className="w-5 h-5" />
                           </button>
                           <div className="h-6 w-[1px] border-l" />
-                          <InactiveUser id={user?._id} />
+                          <DeleteUser id={user?._id} />
                         </span>
                       </td>
                     </tr>
@@ -172,16 +168,16 @@ const ListUsers = () => {
         </section>
       </Panel>
 
-      {isModalOpen && (
+      {isOpen && (
         <Modal
-          isOpen={isModalOpen}
+          isOpen={isOpen}
           onClose={() => {
-            setIsModalOpen(false);
-            dispatch(addUser({}));
+            setIsOpen(false);
+            dispatch(setUser({}));
           }}
           className="lg:w-3/12 md:w-1/2 w-full z-50"
         >
-          <UpdateUser />
+          <UpdateUser setIsOpen={setIsOpen} />
         </Modal>
       )}
     </>

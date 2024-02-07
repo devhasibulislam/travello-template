@@ -22,6 +22,8 @@ import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { IoCloudUploadOutline } from "react-icons/io5";
 
 const Signup = () => {
   const [avatarPreview, setAvatarPreview] = useState(null);
@@ -31,15 +33,16 @@ const Signup = () => {
 
   useEffect(() => {
     if (data) {
-      alert(data?.message);
-      router.push("/auth/signin");
-    }
-    if (error?.data) {
-      alert(error?.data?.message);
-    }
-    if (isLoading) {
+      toast.success(data?.message, { id: "signup" });
+      window.open("/auth/signin", "_self");
       setAvatarPreview(null);
       reset();
+    }
+    if (error?.data) {
+      toast.error(error?.data?.message, { id: "signup" });
+    }
+    if (isLoading) {
+      toast.loading("Signing up...", { id: "signup" });
     }
   }, [data, error, isLoading, reset, router]);
 
@@ -83,85 +86,41 @@ const Signup = () => {
           className="w-full flex flex-col gap-y-4"
           onSubmit={handleSubmit(handleSignup)}
         >
-          <label
-            htmlFor="avatar"
-            className="flex flex-col gap-y-1 w-fit mx-auto items-center"
-          >
-            <span className="text-sm">Upload 300x300 Avatar</span>
-            <div
-              className={
-                "h-[100px] w-[100px] rounded transition-colors flex flex-row justify-center items-center relative" +
-                " " +
-                (avatarPreview
-                  ? ""
-                  : "border-2 border-dashed hover:border-black")
-              }
-            >
-              {avatarPreview ? (
-                <div className="relative">
-                  <LoadImage
-                    src={avatarPreview}
-                    alt="avatar"
-                    height={100}
-                    width={100}
-                    className="rounded h-[100px] w-[100px] object-cover"
-                  />
-                  <button
-                    className="absolute bottom-0 -right-10 p-1 rounded bg-red-500 text-white shadow-2xl"
-                    onClick={() => setAvatarPreview(null)}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <span className="text-xs flex flex-col justify-center items-center gap-y-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
-                      />
-                    </svg>
-                    Add Avatar
-                  </span>
-
-                  <input
-                    type="file"
-                    name="avatar"
-                    id="avatar"
-                    title="Dimension: 300x300"
-                    accept="image/jpg, image/png, image/jpeg"
-                    {...register("avatar", {
-                      required: true,
-                      onChange: (event) => handleAvatarChange(event),
-                    })}
-                    className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-                </>
+          {/* avatar */}
+          <div className="flex flex-col gap-y-2">
+            <div className="flex flex-row overflow-x-auto gap-x-2">
+              {avatarPreview && (
+                <LoadImage
+                  src={avatarPreview}
+                  alt="avatar"
+                  height={100}
+                  width={100}
+                  className="h-[100px] w-[100px] rounded object-cover"
+                />
               )}
             </div>
-          </label>
+            <label htmlFor="avatar" className="relative">
+              <button
+                type="button"
+                className="py-1 px-4 flex flex-row gap-x-2 bg-green-100 border border-green-900 text-green-900 rounded-secondary w-fit text-sm"
+              >
+                <IoCloudUploadOutline className="h-5 w-5" />
+                Choose an avatar*
+              </button>
+              <input
+                type="file"
+                name="avatar"
+                id="avatar"
+                accept="image/png, image/jpg, image/jpeg"
+                className="absolute top-0 left-0 h-full w-full opacity-0 cursor-pointer"
+                {...register("avatar", {
+                  required: true,
+                  onChange: (event) => handleAvatarChange(event),
+                })}
+              />
+            </label>
+          </div>
+
           <label htmlFor="name" className="flex flex-col gap-y-1">
             <span className="text-sm">Enter Your Name</span>
             <input
@@ -171,8 +130,10 @@ const Signup = () => {
               {...register("name", { required: true })}
               placeholder="i.e. Hasibul Islam"
               className=""
+              maxlength="100"
             />
           </label>
+
           <label htmlFor="email" className="flex flex-col gap-y-1">
             <span className="text-sm">Enter Your Email</span>
             <input
@@ -184,6 +145,7 @@ const Signup = () => {
               className=""
             />
           </label>
+
           <label htmlFor="password" className="flex flex-col gap-y-1">
             <span className="text-sm">Enter Your Password</span>
             <input
@@ -195,6 +157,7 @@ const Signup = () => {
               className=""
             />
           </label>
+
           <label htmlFor="phone" className="flex flex-col gap-y-1">
             <span className="text-sm">Enter Your Phone Number</span>
             <input
@@ -206,8 +169,9 @@ const Signup = () => {
               className=""
             />
           </label>
-          <Button type="submit" disabled={isLoading} className="py-2">
-            {isLoading ? "Loading..." : "Sign Up"}
+
+          <Button type="submit" className="py-2 mt-4">
+            Sign up
           </Button>
         </form>
         <div className="text-xs flex flex-row justify-center items-center gap-x-2">

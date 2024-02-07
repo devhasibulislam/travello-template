@@ -1,5 +1,5 @@
 /**
- * Title: Write a program using JavaScript on Cart Model
+ * Title: Write a program using JavaScript on Favorite Model
  * Author: Hasibul Islam
  * Portfolio: https://devhasibulislam.vercel.app
  * Linkedin: https://linkedin.com/in/devhasibulislam
@@ -10,7 +10,7 @@
  * Pinterest: https://pinterest.com/devhasibulislam
  * WhatsApp: https://wa.me/8801906315901
  * Telegram: devhasibulislam
- * Date: 16, November 2023
+ * Date: 24, January 2024
  */
 
 import { Schema, models, model } from "mongoose";
@@ -18,7 +18,7 @@ import connectDB from "@/libs/db";
 
 connectDB();
 
-const cartSchema = new Schema(
+const favoriteSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -44,6 +44,6 @@ const cartSchema = new Schema(
   { timestamps: true }
 );
 
-const Cart = models.Cart || model("Cart", cartSchema);
+const Favorite = models.Favorite || model("Favorite", favoriteSchema);
 
-export default Cart;
+export default Favorite;

@@ -17,36 +17,28 @@ import Button from "@/components/shared/button/Button";
 import Logo from "@/components/shared/logo/Logo";
 import { useSigninMutation } from "@/services/auth/authApi";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
 const Signin = () => {
   const { register, handleSubmit, reset } = useForm();
   const [signin, { isLoading, data, error }] = useSigninMutation();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (localStorage.getItem("accessToken")) {
-      router.push("/");
-    }
-  }, [router]);
 
   useEffect(() => {
     if (data) {
-      alert(data?.message);
-
+      toast.success(data?.message, { id: "signin" });
       if (data?.accessToken) {
         localStorage.setItem("accessToken", data?.accessToken);
-        alert(data?.description);
-        window.location.reload();
+        window.open("/", "_self");
       }
+      reset();
     }
     if (error?.data) {
-      alert(error?.data?.message);
+      toast.error(error?.data?.message, { id: "signin" });
     }
     if (isLoading) {
-      reset();
+      toast.loading("Signing in...", { id: "signin" });
     }
   }, [data, error, isLoading, reset]);
 
@@ -90,7 +82,7 @@ const Signin = () => {
             />
           </label>
           <Button type="submit" disabled={isLoading} className="py-2">
-            {isLoading ? "Loading..." : "Sign In"}
+            Sign in
           </Button>
         </form>
         <div className="text-xs flex flex-row justify-center items-center gap-x-2">

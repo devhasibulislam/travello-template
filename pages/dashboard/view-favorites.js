@@ -1,5 +1,5 @@
 /**
- * Title: Write a program using JavaScript on Index
+ * Title: Write a program using JavaScript on View-favorites
  * Author: Hasibul Islam
  * Portfolio: https://devhasibulislam.vercel.app
  * Linkedin: https://linkedin.com/in/devhasibulislam
@@ -10,26 +10,19 @@
  * Pinterest: https://pinterest.com/devhasibulislam
  * WhatsApp: https://wa.me/8801906315901
  * Telegram: devhasibulislam
- * Date: 15, November 2023
+ * Date: 01, February 2024
  */
 
 import Panel from "@/layouts/Panel";
 import React from "react";
 
-const Dashboard = () => {
+const ViewFavorites = () => {
   return (
     <Panel>
-      <div className="w-full h-full flex justify-center items-center !rounded">
-        <iframe
-          title="Portfolio"
-          src="https://bento.me/devhasibulislam"
-          style={{ width: "100%", height: "100%", borderRadius: "10px" }}
-          frameBorder="0"
-          scrolling="auto"
-        ></iframe>
-      </div>
+      Show rents and modal that show users and action button that remove from
+      users's favorites
     </Panel>
   );
 };
 
-export default Dashboard;
+export default ViewFavorites;

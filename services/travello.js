@@ -20,6 +20,7 @@ export const travelloApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/api`,
   }),
-  tagTypes: ["User", "Cart", "Rent"],
+  tagTypes: ["User", "Cart", "Rent", "Favorite", "Purchase", "Review"],
+  refetchOnMountOrArgChange: true,
   endpoints: () => ({}),
 });

@@ -13,6 +13,7 @@
  * Date: 16, November 2023
  */
 
+import cron from "node-cron";
 import { Schema, models, model } from "mongoose";
 import connectDB from "@/libs/db";
 
@@ -23,11 +24,18 @@ const rentSchema = new Schema(
     title: {
       type: String,
       required: [true, "Please enter rent title"],
+      unique: true,
+      trim: true,
+      maxLength: [100, "Title cannot be more than 100 characters"],
     },
-    description: {
+
+    summary: {
       type: String,
-      required: [true, "Please enter rent description"],
+      required: [true, "Please enter rent summary"],
+      trim: true,
+      maxLength: [500, "summary cannot be more than 500 characters"],
     },
+
     gallery: [
       {
         url: {
@@ -40,45 +48,74 @@ const rentSchema = new Schema(
         },
       },
     ],
+
     price: {
       type: Number,
       required: [true, "Please provide rent price"],
     },
+
     members: {
       type: Number,
       required: [true, "Please provide how many members"],
+      default: 0,
     },
+
     duration: {
       startDate: Date,
       endDate: Date,
     },
+
     location: {
       type: String,
       required: [true, "Please enter rent location"],
     },
+
     type: {
       type: String,
       required: [true, "Please enter rent type"],
     },
-    informationArray: [
+
+    information: [
       {
-        information: String,
+        type: String,
+        trim: true,
+        maxLength: [100, "information cannot be more than 100 characters"],
       },
     ],
-    timeArray: [
+
+    times: [
       {
-        time: String,
+        type: String,
+        trim: true,
+        maxLength: [100, "times cannot be more than 100 characters"],
       },
     ],
-    user: {
+
+    owner: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+
+    users: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
+    reviews: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
+
     status: {
       type: String,
       enum: ["active", "inactive"],
       default: "active",
     },
+
     createdAt: {
       type: Date,
       default: Date.now,
@@ -93,6 +130,33 @@ const rentSchema = new Schema(
   }
 );
 
+// Pre-save middleware to update the status based on endDate
+rentSchema.pre("save", function (next) {
+  const currentDate = new Date();
+  if (
+    this.duration &&
+    this.duration.endDate &&
+    currentDate > this.duration.endDate
+  ) {
+    this.status = "inactive";
+  }
+  next();
+});
+
 const Rent = models.Rent || model("Rent", rentSchema);
+
+// Schedule a job to run every day to check and update the status
+cron.schedule("0 0 * * *", async () => {
+  const currentDate = new Date();
+  const rentsToUpdate = await Rent.find({
+    "duration.endDate": { $lt: currentDate },
+    status: "active",
+  });
+
+  for (const rent of rentsToUpdate) {
+    rent.status = "inactive";
+    await rent.save();
+  }
+});
 
 export default Rent;

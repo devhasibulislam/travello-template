@@ -1,5 +1,5 @@
 /**
- * Title: Write a program using JavaScript on Add Rent
+ * Title: Write a program using JavaScript on Add-rent
  * Author: Hasibul Islam
  * Portfolio: https://devhasibulislam.vercel.app
  * Linkedin: https://linkedin.com/in/devhasibulislam
@@ -10,44 +10,68 @@
  * Pinterest: https://pinterest.com/devhasibulislam
  * WhatsApp: https://wa.me/8801906315901
  * Telegram: devhasibulislam
- * Date: 16, November 2023
+ * Date: 26, January 2024
  */
 
-import Panel from "@/components/sidebar/Panel";
+import LoadImage from "@/components/shared/image/LoadImage";
 import hotelTypes from "@/data/hotelTypes";
 import useGetCountries from "@/hooks/useGetCountries";
-import React, { useEffect, useState } from "react";
+import Panel from "@/layouts/Panel";
+import dynamic from "next/dynamic";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { FiPlus } from "react-icons/fi";
-import { HiOutlineMinus } from "react-icons/hi";
-import { GrCloudUpload } from "react-icons/gr";
+import { IoCloudUploadOutline } from "react-icons/io5";
+import { CgTrash } from "react-icons/cg";
 import Button from "@/components/shared/button/Button";
-import LoadImage from "@/components/shared/image/LoadImage";
-import { useSelector } from "react-redux";
 import { useAddRentMutation } from "@/services/rent/rentApi";
+import { toast } from "react-hot-toast";
 
 const AddRent = () => {
-  const countries = useGetCountries();
   const [galleryPreview, setGalleryPreview] = useState([]);
-  const user = useSelector((state) => state?.user);
   const [addRent, { isLoading, data, error }] = useAddRentMutation();
-  const { register, handleSubmit, control, reset } = useForm({
-    defaultValues: {
-      informationArray: [{ information: "" }],
-      timeArray: [{ time: "" }],
-    },
+  const [country, setCountry] = useState("Bangladesh");
+  const { register, handleSubmit, control, reset } = useForm();
+  const {
+    fields: informationFields,
+    append: informationAppend,
+    remove: informationRemove,
+  } = useFieldArray({
+    control,
+    name: "information",
   });
+  const {
+    fields: timesFields,
+    append: timesAppend,
+    remove: timesRemove,
+  } = useFieldArray({
+    control,
+    name: "times",
+  });
+  const countries = useGetCountries();
+
+  const GeoLocation = useMemo(
+    () =>
+      dynamic(() => import("@/components/detail/GeoLocation"), {
+        loading: () => <p className="font-sans">Map is loading...</p>,
+        ssr: false,
+      }),
+    []
+  );
 
   useEffect(() => {
-    if (data) {
-      alert(data?.message);
-    }
-    if (error?.data) {
-      alert(error?.data?.message);
-    }
     if (isLoading) {
+      toast.loading("Adding rent...", { id: "add-rent" });
+    }
+
+    if (data) {
+      toast.success(data?.message, { id: "add-rent" });
       setGalleryPreview([]);
       reset();
+    }
+
+    if (error?.data) {
+      toast.error(error?.data?.message, { id: "add-rent" });
     }
   }, [data, error, isLoading, reset]);
 
@@ -76,342 +100,289 @@ const AddRent = () => {
     }
   };
 
-  const {
-    fields: informationFields,
-    append: informationAppend,
-    remove: informationRemove,
-  } = useFieldArray({
-    control,
-    name: "informationArray",
-  });
-  const {
-    fields: timeFields,
-    append: timeAppend,
-    remove: timeRemove,
-  } = useFieldArray({
-    control,
-    name: "timeArray",
-  });
-
   const handleAddRent = (data) => {
+    const times = data.times.map((t) => t.times);
+    const information = data.information.map((i) => i.information);
+
     const formData = new FormData();
 
     formData.append("title", data.title);
-    formData.append("description", data.description);
+    formData.append("summary", data.summary);
     formData.append("price", data.price);
     formData.append("members", data.members);
     formData.append("location", data.location);
     formData.append("type", data.type);
-    formData.append("user", user?._id);
-
-    data.informationArray.forEach((field) => {
-      formData.append(
-        "informationArray",
-        JSON.stringify({ information: field.information })
-      );
-    });
-
-    data.timeArray.forEach((field) => {
-      formData.append("timeArray", JSON.stringify({ time: field.time }));
-    });
 
     for (let i = 0; i < data.gallery.length; i++) {
       formData.append("gallery", data.gallery[i]);
     }
 
-    formData.append(
-      "duration",
-      JSON.stringify({
-        startDate: new Date(data.startDate),
-        endDate: new Date(data.endDate),
-      })
-    );
+    for (let i = 0; i < information.length; i++) {
+      formData.append("information", information[i]);
+    }
+
+    for (let i = 0; i < times.length; i++) {
+      formData.append("times", times[i]);
+    }
+
+    formData.append("duration", JSON.stringify(data.duration));
 
     addRent(formData);
   };
 
   return (
     <Panel>
-      <section className="h-full">
-        <form
-          className="grid grid-cols-12 lg:gap-x-6 gap-4 relative"
-          onSubmit={handleSubmit(handleAddRent)}
-        >
-          {/* rent gallery */}
-          <div className="lg:col-span-5 col-span-12">
-            {galleryPreview?.length === 0 ? (
-              <>
-                <div className="w-full min-h-[300px] border-2 border-dashed rounded p-2 relative flex justify-center items-center">
-                  <input
-                    type="file"
-                    name="gallery"
-                    id="gallery"
-                    multiple
-                    accept="image/png, image/jpg, image/jpeg"
-                    {...register("gallery", {
-                      required: true,
-                      onChange: (event) => handleSetGalleryPreview(event),
-                    })}
-                    className="absolute top-0 left-0 w-full h-full cursor-pointer opacity-0"
-                  />
-                  <span className="flex flex-col gap-y-2 items-center">
-                    <span className="p-4 rounded-secondary border">
-                      <GrCloudUpload className="h-10 w-10" />
-                    </span>
-                    <span className="text-sm text-center">
-                      Upload Gallery <br /> upto <b>5</b> Images
-                    </span>
-                  </span>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="grid grid-cols-12 gap-2">
-                  {galleryPreview?.map((image, index) => (
-                    <LoadImage
-                      src={image}
-                      key={index}
-                      alt="gallery"
-                      height={512}
-                      width={364}
-                      className={
-                        "h-[200px] w-full rounded object-cover" +
-                        (galleryPreview?.length === 1
-                          ? " col-span-12"
-                          : galleryPreview?.length === 2
-                          ? " col-span-12"
-                          : galleryPreview?.length === 3
-                          ? index === 0
-                            ? " col-span-12"
-                            : " col-span-6"
-                          : galleryPreview?.length === 4
-                          ? index === 0 || index === 1
-                            ? " col-span-12"
-                            : " col-span-6"
-                          : galleryPreview?.length === 5 && index === 0
-                          ? " col-span-12"
-                          : " col-span-6")
-                      }
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* rent form */}
-          <div className="lg:col-span-7 col-span-12 flex flex-col gap-y-4">
-            {/* rent title */}
-            <label htmlFor="title" className="flex flex-col gap-y-2">
-              <span className="text-sm">Rent Title*</span>
-              <input
-                type="text"
-                name="title"
-                id="title"
-                {...register("title", { required: true })}
-                placeholder="Type rent title here..."
-                className="!rounded"
-              />
-            </label>
-
-            {/* rent description */}
-            <label htmlFor="description" className="flex flex-col gap-y-2">
-              <span className="text-sm">Rent Description*</span>
-              <textarea
-                name="description"
-                id="description"
-                rows="5"
-                {...register("description", { required: true })}
-                placeholder="Type rent description here..."
-                className="!rounded"
-              ></textarea>
-            </label>
-
-            {/* rent price */}
-            <label htmlFor="price" className="flex flex-col gap-y-2 flex-1">
-              <span className="text-sm">Rent Price*</span>
-              <input
-                type="number"
-                name="price"
-                id="price"
-                {...register("price", { required: true })}
-                placeholder="Type rent price here..."
-                className="!rounded"
-              />
-            </label>
-
-            {/* number of members */}
-            <label htmlFor="members" className="flex flex-col gap-y-2 flex-1">
-              <span className="text-sm">Number of Members*</span>
-              <input
-                type="number"
-                name="members"
-                id="members"
-                {...register("members", { required: true })}
-                placeholder="Type rent members here..."
-                className="!rounded"
-              />
-            </label>
-
-            {/* rent duration */}
-            <p className="flex lg:flex-row flex-col gap-4">
-              {/* start date */}
-              <label
-                htmlFor="startDate"
-                className="flex flex-col gap-y-2 flex-1"
-              >
-                <span className="text-sm !text-white">Rent Start Date*</span>
-                <input
-                  type="date"
-                  name="startDate"
-                  id="startDate"
-                  {...register("startDate", { required: true })}
-                  className="!rounded"
+      <form
+        action=""
+        className="text-sm lg:w-1/2 md:w-3/4 w-full h-full flex flex-col gap-y-4"
+        onSubmit={handleSubmit(handleAddRent)}
+      >
+        {/* gallery */}
+        <div className="flex flex-col gap-y-2">
+          <div className="flex flex-row overflow-x-auto gap-x-2">
+            {galleryPreview?.length > 0 &&
+              galleryPreview?.map((image, index) => (
+                <LoadImage
+                  key={index}
+                  src={image}
+                  alt="gallery"
+                  height={100}
+                  width={100}
+                  className="h-[100px] w-[100px] rounded object-cover"
                 />
-              </label>
-
-              {/* end date */}
-              <label htmlFor="endDate" className="flex flex-col gap-y-2 flex-1">
-                <span className="text-sm !text-white">Rent End Date*</span>
-                <input
-                  type="date"
-                  name="endDate"
-                  id="endDate"
-                  {...register("endDate", { required: true })}
-                  className="!rounded"
-                />
-              </label>
-            </p>
-
-            {/* rent location */}
-            <label htmlFor="location" className="flex flex-col gap-y-2 flex-1">
-              <span className="text-sm">Choose Location*</span>
-              {countries?.length === 0 ? (
-                <>Loading...</>
-              ) : (
-                <select
-                  name="location"
-                  id="location"
-                  {...register("location", { required: true })}
-                  className=""
-                >
-                  {countries?.map((country, index) => (
-                    <option key={index} value={country?.name?.toLowerCase()}>
-                      {country?.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </label>
-
-            {/* rent types */}
-            <label htmlFor="type" className="flex flex-col gap-y-2 flex-1">
-              <span className="text-sm">Choose Rent Type*</span>
-              {countries?.length === 0 ? (
-                <>Loading...</>
-              ) : (
-                <select
-                  name="type"
-                  id="type"
-                  {...register("type", { required: true })}
-                  className=""
-                >
-                  {hotelTypes?.map((type, index) => (
-                    <option key={index} value={type?.name?.toLowerCase()}>
-                      {type?.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </label>
-
-            {/* important information */}
-            <label htmlFor="information" className="flex flex-col gap-y-2">
-              <span className="text-sm flex flex-row justify-between items-center">
-                Rent Feature Information*{" "}
-                <button
-                  type="button"
-                  onClick={() => informationAppend({ information: "" })}
-                  className="p-0.5 border rounded-secondary bg-green-500 !text-black"
-                >
-                  <FiPlus className="w-4 h-4" />
-                </button>
-              </span>
-              {informationFields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="flex flex-row gap-x-2 items-center"
-                >
-                  <input
-                    type="text"
-                    name={`informationArray[${index}].information`}
-                    {...register(`informationArray[${index}].information`, {
-                      required: true,
-                    })}
-                    placeholder="Type one-line information here..."
-                    className="!rounded flex-1"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => informationRemove(index)}
-                    className="p-0.5 border rounded-secondary bg-red-500 !text-black"
-                  >
-                    <HiOutlineMinus className="w-4 h-4" />
-                  </button>
-                </div>
               ))}
-            </label>
-
-            {/* open time */}
-            <label htmlFor="time" className="flex flex-col gap-y-2">
-              <span className="text-sm flex flex-row justify-between items-center">
-                Rent Open Time Information*{" "}
-                <button
-                  type="button"
-                  onClick={() => timeAppend({ time: "" })}
-                  className="p-0.5 border rounded-secondary bg-green-500 !text-black"
-                >
-                  <FiPlus className="w-4 h-4" />
-                </button>
-              </span>
-              {timeFields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="flex flex-row gap-x-2 items-center"
-                >
-                  <input
-                    type="text"
-                    name={`timeArray[${index}].time`}
-                    {...register(`timeArray[${index}].time`, {
-                      required: true,
-                    })}
-                    placeholder="Type open time information here..."
-                    className="!rounded flex-1"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => timeRemove(index)}
-                    className="p-0.5 border rounded-secondary bg-red-500 !text-black"
-                  >
-                    <HiOutlineMinus className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </label>
           </div>
-
-          <div className="col-span-12 grid grid-cols-12">
-            <div className="lg:col-span-5" />
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="lg:col-span-7 col-span-12 py-2"
+          <label htmlFor="gallery" className="relative">
+            <button
+              type="button"
+              className="py-1 px-4 flex flex-row gap-x-2 bg-green-100 border border-green-900 text-green-900 rounded-secondary w-fit"
             >
-              {isLoading ? "Loading..." : "Add New Rent"}
-            </Button>
-          </div>
-        </form>
-      </section>
+              <IoCloudUploadOutline className="h-5 w-5" />
+              Choose upto 5 photos*
+            </button>
+            <input
+              type="file"
+              name="gallery"
+              id="gallery"
+              accept="image/png, image/jpg, image/jpeg"
+              className="absolute top-0 left-0 h-full w-full opacity-0 cursor-pointer"
+              multiple
+              {...register("gallery", {
+                required: true,
+                onChange: (event) => handleSetGalleryPreview(event),
+              })}
+            />
+          </label>
+        </div>
+
+        {/* title */}
+        <label htmlFor="title" className="flex flex-col gap-y-2">
+          Rent Title*
+          <input
+            type="text"
+            name="title"
+            id="title"
+            maxLength={100}
+            placeholder="Type rent title here..."
+            className="rounded"
+            {...register("title", { required: true })}
+            maxlength="100"
+          />
+        </label>
+
+        {/* summary */}
+        <label htmlFor="summary" className="flex flex-col gap-y-2">
+          Rent Summary*
+          <textarea
+            name="summary"
+            id="summary"
+            rows="5"
+            maxLength={500}
+            placeholder="Type rent summary here..."
+            className="rounded"
+            {...register("summary", { required: true })}
+            maxlength="500"
+          ></textarea>
+        </label>
+
+        {/* price */}
+        <label htmlFor="price" className="flex flex-col gap-y-2">
+          Rent Price*
+          <input
+            type="number"
+            name="price"
+            id="price"
+            placeholder="Type rent price here..."
+            className="rounded"
+            {...register("price", { required: true })}
+          />
+        </label>
+
+        {/* members */}
+        <label htmlFor="members" className="flex flex-col gap-y-2">
+          Number of Members*
+          <input
+            type="number"
+            name="members"
+            id="members"
+            placeholder="Type rent members here..."
+            className="rounded"
+            {...register("members", { required: true })}
+          />
+        </label>
+
+        {/* duration */}
+        <div className="flex md:flex-row flex-col gap-4 w-full">
+          {/* start date */}
+          <label htmlFor="startDate" className="flex flex-col gap-y-2 w-full">
+            Rent Start Date*
+            <input
+              type="date"
+              name="startDate"
+              id="startDate"
+              className="rounded"
+              {...register("duration.startDate", { required: true })}
+            />
+          </label>
+
+          {/* end date */}
+          <label htmlFor="endDate" className="flex flex-col gap-y-2 w-full">
+            Rent End Date*
+            <input
+              type="date"
+              name="endDate"
+              id="endDate"
+              className="rounded"
+              {...register("duration.endDate", { required: true })}
+            />
+          </label>
+        </div>
+
+        {/* type */}
+        <label htmlFor="type" className="flex flex-col gap-y-2">
+          Choose Rent Type*
+          <select
+            name="type"
+            id="type"
+            className="rounded"
+            {...register("type", { required: true })}
+          >
+            {hotelTypes?.map(({ name }, index) => (
+              <option key={index} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        {/* location */}
+        <div className="flex flex-col gap-y-4">
+          <label htmlFor="location" className="flex flex-col gap-y-2">
+            Choose Location*
+            <select
+              name="location"
+              id="location"
+              className="rounded"
+              {...register("location", {
+                required: true,
+                onChange: (e) => setCountry(e.target.value),
+              })}
+            >
+              <option selected disabled>
+                {country}
+              </option>
+              {countries?.map((country, index) => (
+                <option key={index} value={country?.name}>
+                  {country?.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <GeoLocation location={country} zoom={10} height="200px" />
+        </div>
+
+        {/* information */}
+        <label htmlFor="information" className="flex flex-col gap-y-2">
+          Additional Information*
+          <p className="flex flex-col gap-y-2">
+            {informationFields.map((field, index) => (
+              <span
+                key={field.id}
+                className="flex flex-row gap-x-2 items-center"
+              >
+                <input
+                  type="text"
+                  name={`information[${index}].information`}
+                  id="information"
+                  className="w-full rounded"
+                  placeholder="Type information here..."
+                  {...register(`information.${index}.information`, {
+                    required: true,
+                  })}
+                  maxlength="100"
+                />
+                <button
+                  type="button"
+                  className="bg-red-100 border border-red-900 text-red-900 p-0.5 rounded-secondary"
+                  onClick={() => informationRemove(index)}
+                >
+                  <CgTrash className="w-4 h-4" />
+                </button>
+              </span>
+            ))}
+            <button
+              type="button"
+              className="bg-green-100 border border-green-900 text-green-900 py-1 rounded-secondary flex flex-row gap-x-1 items-center px-2 w-fit text-xs"
+              onClick={() => informationAppend({ information: "" })}
+            >
+              <FiPlus className="w-4 h-4" /> Add information*
+            </button>
+          </p>
+        </label>
+
+        {/* times */}
+        <label htmlFor="times" className="flex flex-col gap-y-2">
+          Additional Times*
+          <p className="flex flex-col gap-y-2">
+            {timesFields.map((field, index) => (
+              <span
+                key={field.id}
+                className="flex flex-row gap-x-2 items-center"
+              >
+                <input
+                  type="text"
+                  name={`times[${index}].times`}
+                  id="times"
+                  className="w-full rounded"
+                  placeholder="Type times here..."
+                  {...register(`times.${index}.times`, {
+                    required: true,
+                  })}
+                  maxlength="100"
+                />
+                <button
+                  type="button"
+                  className="bg-red-100 border border-red-900 text-red-900 p-0.5 rounded-secondary"
+                  onClick={() => timesRemove(index)}
+                >
+                  <CgTrash className="w-4 h-4" />
+                </button>
+              </span>
+            ))}
+            <button
+              type="button"
+              className="bg-green-100 border border-green-900 text-green-900 py-1 rounded-secondary flex flex-row gap-x-1 items-center px-2 w-fit text-xs"
+              onClick={() => timesAppend({ times: "" })}
+            >
+              <FiPlus className="w-4 h-4" /> Add Time*
+            </button>
+          </p>
+        </label>
+
+        <Button type="submit" className="py-2 mt-4">
+          Create Rent
+        </Button>
+      </form>
     </Panel>
   );
 };

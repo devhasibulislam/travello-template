@@ -24,6 +24,7 @@ const userSchema = new Schema(
     name: {
       type: String,
       required: [true, "Please enter your name"],
+      maxLength: [100, "Name cannot be more than 100 characters"],
     },
 
     email: {
@@ -56,14 +57,20 @@ const userSchema = new Schema(
 
     role: {
       type: String,
-      enum: ["buyer", "seller", "admin"],
-      default: "buyer",
+      enum: ["user", "admin"],
+      default: "user",
     },
 
     status: {
       type: String,
       enum: ["active", "inactive"],
       default: "active",
+    },
+
+    address: {
+      type: String,
+      trim: true,
+      maxLength: [200, "Address cannot be more than 200 characters"],
     },
 
     rents: [
@@ -77,6 +84,25 @@ const userSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Cart",
     },
+
+    favorite: {
+      type: Schema.Types.ObjectId,
+      ref: "Favorite",
+    },
+
+    reviews: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
+
+    purchases: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Purchase",
+      },
+    ],
 
     createdAt: {
       type: Date,

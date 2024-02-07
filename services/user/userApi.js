@@ -56,8 +56,32 @@ const userApi = travelloApi.injectEndpoints({
 
       invalidatesTags: ["User"],
     }),
+
+    // delete an user
+    deleteUser: builder.mutation({
+      query: (id) => ({
+        url: `/users/${id}`,
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+
+      invalidatesTags: [
+        "User",
+        "Cart",
+        "Rent",
+        "Favorite",
+        "Purchase",
+        "Review",
+      ],
+    }),
   }),
 });
 
-export const { useGetUsersQuery, useUpdateUserMutation, useGetUserQuery } =
-  userApi;
+export const {
+  useGetUsersQuery,
+  useUpdateUserMutation,
+  useGetUserQuery,
+  useDeleteUserMutation,
+} = userApi;

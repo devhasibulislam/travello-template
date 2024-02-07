@@ -1,5 +1,5 @@
 /**
- * Title: Write a program using JavaScript on CartApi
+ * Title: Write a program using JavaScript on FavoriteApi
  * Author: Hasibul Islam
  * Portfolio: https://devhasibulislam.vercel.app
  * Linkedin: https://linkedin.com/in/devhasibulislam
@@ -10,17 +10,17 @@
  * Pinterest: https://pinterest.com/devhasibulislam
  * WhatsApp: https://wa.me/8801906315901
  * Telegram: devhasibulislam
- * Date: 19, November 2023
+ * Date: 04, February 2024
  */
 
 const { travelloApi } = require("../travello");
 
-const cartApi = travelloApi.injectEndpoints({
+const favoriteApi = travelloApi.injectEndpoints({
   endpoints: (builder) => ({
-    // add to cart
-    addToCart: builder.mutation({
+    // add to favorite
+    addToFavorite: builder.mutation({
       query: (body) => ({
-        url: "/cart/",
+        url: "/favorite/",
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -28,36 +28,39 @@ const cartApi = travelloApi.injectEndpoints({
         body,
       }),
 
-      invalidatesTags: ["Cart", "User"],
+      invalidatesTags: ["Favorite", "User"],
     }),
 
-    // get cart
-    getCart: builder.query({
+    // get favorites list
+    getFavorites: builder.query({
       query: () => ({
-        url: "/cart/",
+        url: "/favorite/",
         method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
       }),
 
-      providesTags: ["Cart"],
+      providesTags: ["Favorite"],
     }),
 
-    // remove from cart
-    removeFromCart: builder.mutation({
+    // delete from favorites
+    deleteFromFavorite: builder.mutation({
       query: (id) => ({
-        url: `/cart/${id}`,
+        url: `/favorite/${id}`,
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       }),
 
-      invalidatesTags: ["Cart", "User"],
+      invalidatesTags: ["Favorite", "User"],
     }),
   }),
 });
 
 export const {
-  useAddToCartMutation,
-  useGetCartQuery,
-  useRemoveFromCartMutation,
-} = cartApi;
+  useAddToFavoriteMutation,
+  useGetFavoritesQuery,
+  useDeleteFromFavoriteMutation,
+} = favoriteApi;

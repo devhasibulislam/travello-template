@@ -1,5 +1,5 @@
 /**
- * Title: Write a program using JavaScript on CartApi
+ * Title: Write a program using JavaScript on ReviewApi
  * Author: Hasibul Islam
  * Portfolio: https://devhasibulislam.vercel.app
  * Linkedin: https://linkedin.com/in/devhasibulislam
@@ -10,17 +10,17 @@
  * Pinterest: https://pinterest.com/devhasibulislam
  * WhatsApp: https://wa.me/8801906315901
  * Telegram: devhasibulislam
- * Date: 19, November 2023
+ * Date: 05, February 2024
  */
 
 const { travelloApi } = require("../travello");
 
-const cartApi = travelloApi.injectEndpoints({
-  endpoints: (builder) => ({
-    // add to cart
-    addToCart: builder.mutation({
+const reviewApi = travelloApi.injectEndpoints({
+  endpoints: (build) => ({
+    // post a review
+    addReview: build.mutation({
       query: (body) => ({
-        url: "/cart/",
+        url: "/review/",
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -28,36 +28,48 @@ const cartApi = travelloApi.injectEndpoints({
         body,
       }),
 
-      invalidatesTags: ["Cart", "User"],
+      invalidatesTags: ["Review", "User", "Rent"],
     }),
 
-    // get cart
-    getCart: builder.query({
+    // get all reviews
+    getAllReviews: build.query({
       query: () => ({
-        url: "/cart/",
+        url: "/review/",
         method: "GET",
       }),
-
-      providesTags: ["Cart"],
     }),
 
-    // remove from cart
-    removeFromCart: builder.mutation({
+    // modify review
+    modifyReview: build.mutation({
+      query: ({ id, body }) => ({
+        url: `/review/${id}`,
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        body,
+      }),
+
+      invalidatesTags: ["Review", "User", "Rent"],
+    }),
+
+    // delete review
+    deleteReview: build.mutation({
       query: (id) => ({
-        url: `/cart/${id}`,
+        url: `/review/${id}`,
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       }),
 
-      invalidatesTags: ["Cart", "User"],
+      invalidatesTags: ["Review", "User", "Rent"],
     }),
   }),
 });
 
 export const {
-  useAddToCartMutation,
-  useGetCartQuery,
-  useRemoveFromCartMutation,
-} = cartApi;
+  useAddReviewMutation,
+  useGetAllReviewsQuery,
+  useModifyReviewMutation,
+} = reviewApi;

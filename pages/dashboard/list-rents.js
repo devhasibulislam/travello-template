@@ -13,16 +13,17 @@
  * Date: 16, November 2023
  */
 
-import Panel from "@/components/sidebar/Panel";
 import LoadImage from "@/components/shared/image/LoadImage";
 import Table from "@/components/shared/loading/Table";
 import Link from "next/link";
 import React, { useEffect, useMemo } from "react";
 import { FiEdit3 } from "react-icons/fi";
 import { useGetRentsQuery } from "@/services/rent/rentApi";
-import InactiveRent from "@/components/dashboard/InactiveRent";
+import DeleteRent from "@/components/dashboard/DeleteRent";
 import { useDispatch } from "react-redux";
 import { setRent } from "@/features/rent/rentSlice";
+import Panel from "@/layouts/Panel";
+import { toast } from "react-hot-toast";
 
 const ListRents = () => {
   const { data, isLoading, error } = useGetRentsQuery();
@@ -30,10 +31,14 @@ const ListRents = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (error?.data) {
-      alert(error?.data?.message);
+    if (data) {
+      toast.success(data?.message, { id: "fetch-rents" });
     }
-  }, [error]);
+
+    if (error?.data) {
+      toast.error(error?.data?.message, { id: "fetch-rents" });
+    }
+  }, [error, data]);
 
   return (
     <Panel>
@@ -102,7 +107,7 @@ const ListRents = () => {
                       scope="row"
                       className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                     >
-                      <span className="text-sm">{rent?.title}</span>
+                      <span className="text-sm block w-56 truncate">{rent?.title}</span>
                     </td>
                     <td
                       scope="row"
@@ -148,7 +153,7 @@ const ListRents = () => {
                       scope="row"
                       className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                     >
-                      <span className="text-sm">{rent?.user?.name}</span>
+                      <span className="text-sm">{rent?.owner?.name}</span>
                     </td>
                     <td
                       scope="row"
@@ -158,8 +163,8 @@ const ListRents = () => {
                         className={
                           "text-sm" +
                           (rent?.status === "active"
-                            ? " text-green-500"
-                            : " text-red-500")
+                            ? " text-green-900 border border-green-900 bg-green-100/50 px-2 rounded"
+                            : " text-red-900 border border-red-900 bg-red-100/50 px-2 rounded")
                         }
                       >
                         {rent?.status}
@@ -178,7 +183,7 @@ const ListRents = () => {
                           <FiEdit3 className="w-5 h-5" />
                         </Link>
                         <div className="h-6 w-[1px] border-l" />
-                        <InactiveRent id={rent?._id} />
+                        <DeleteRent id={rent?._id} />
                       </span>
                     </td>
                   </tr>

@@ -28,7 +28,14 @@ const rentApi = travelloApi.injectEndpoints({
         body,
       }),
 
-      invalidatesTags: ["Rent"],
+      invalidatesTags: [
+        "Rent",
+        "User",
+        "Cart",
+        "Favorite",
+        "Purchase",
+        "Review",
+      ],
     }),
 
     // get all rents
@@ -62,7 +69,34 @@ const rentApi = travelloApi.injectEndpoints({
         body,
       }),
 
-      invalidatesTags: ["Rent"],
+      invalidatesTags: [
+        "Rent",
+        "User",
+        "Cart",
+        "Favorite",
+        "Purchase",
+        "Review",
+      ],
+    }),
+
+    // delete rent
+    deleteRent: builder.mutation({
+      query: (id) => ({
+        url: `/rent/${id}`,
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+
+      invalidatesTags: [
+        "Rent",
+        "User",
+        "Cart",
+        "Favorite",
+        "Purchase",
+        "Review",
+      ],
     }),
 
     // get filtered rents
@@ -83,5 +117,6 @@ export const {
   useGetRentsQuery,
   useGetRentQuery,
   useUpdateRentMutation,
+  useDeleteRentMutation,
   useGetFilteredRentsMutation,
 } = rentApi;

@@ -1,5 +1,5 @@
 /**
- * Title: Write a program using JavaScript on Cart Model
+ * Title: Write a program using JavaScript on Purchase Model
  * Author: Hasibul Islam
  * Portfolio: https://devhasibulislam.vercel.app
  * Linkedin: https://linkedin.com/in/devhasibulislam
@@ -10,7 +10,7 @@
  * Pinterest: https://pinterest.com/devhasibulislam
  * WhatsApp: https://wa.me/8801906315901
  * Telegram: devhasibulislam
- * Date: 16, November 2023
+ * Date: 24, January 2024
  */
 
 import { Schema, models, model } from "mongoose";
@@ -18,19 +18,25 @@ import connectDB from "@/libs/db";
 
 connectDB();
 
-const cartSchema = new Schema(
+const purchaseSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
 
-    rents: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Rent",
-      },
-    ],
+    rent: {
+      type: Schema.Types.ObjectId,
+      ref: "Rent",
+    },
+
+    status: {
+      type: String,
+      enum: ["pending", "success"],
+      default: "pending",
+    },
+
+    price: Number,
 
     createdAt: {
       type: Date,
@@ -41,9 +47,11 @@ const cartSchema = new Schema(
       default: Date.now,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-const Cart = models.Cart || model("Cart", cartSchema);
+const Purchase = models?.Purchase || model("Purchase", purchaseSchema);
 
-export default Cart;
+export default Purchase;
