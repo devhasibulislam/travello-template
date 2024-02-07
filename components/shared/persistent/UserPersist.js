@@ -13,22 +13,22 @@
  * Date: 17, November 2023
  */
 
-import { setUser } from "@/features/user/userSlice";
-import { useGetUserQuery } from "@/services/auth/authApi";
+import { usePersistUserQuery } from "@/services/auth/authApi";
 import React from "react";
 import { useMemo } from "react";
 import { useDispatch } from "react-redux";
 import Screen from "../loading/Screen";
 import { useEffect } from "react";
+import { addUser } from "@/features/auth/authSlice";
 
 const UserPersist = ({ children }) => {
-  const { data, isLoading, error } = useGetUserQuery();
+  const { data, isLoading, error } = usePersistUserQuery();
   const user = useMemo(() => data?.data || {}, [data]);
   const dispatch = useDispatch();
-
+  
   useEffect(() => {
     if (Object?.keys(user).length > 0) {
-      dispatch(setUser(user));
+      dispatch(addUser(user));
     }
     if (error) {
       console.log(error?.data?.message);

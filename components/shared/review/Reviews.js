@@ -25,7 +25,7 @@ import "keen-slider/keen-slider.min.css";
 
 const animation = { duration: 50000, easing: (t) => t };
 
-const Reviews = () => {
+const Reviews = ({ className }) => {
   const reviews = [
     {
       name: "Eli Jang",
@@ -137,7 +137,7 @@ const Reviews = () => {
 
   return (
     <section className="h-full py-12">
-      <Container>
+      <Container className={`${className}`}>
         <div className="w-full h-full flex flex-col gap-y-12">
           <article className="flex flex-col gap-y-4">
             <h1 className="lg:text-5xl md:text-4xl text-3xl whitespace-normal">
