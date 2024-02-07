@@ -26,7 +26,8 @@ const Modal = ({ isOpen, onClose, children, className }) => {
       ></div>
       <div
         className={
-          "z-10 bg-white rounded p-secondary shadow-lg border border-primary mx-4" + ` ${className}`
+          "z-10 bg-white rounded p-secondary shadow-lg border border-primary mx-4 h-96 overflow-y-auto scrollbar-hide lg:w-1/2 md:w-3/5 w-full" +
+          ` ${className}`
         }
       >
         {children}
