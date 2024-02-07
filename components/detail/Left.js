@@ -15,25 +15,73 @@
 
 import React, { useEffect } from "react";
 import LoadImage from "@/components/shared/image/LoadImage";
-import { AiOutlineCalendar } from "react-icons/ai";
+import { AiOutlineCalendar, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BiCodeAlt } from "react-icons/bi";
 import { FiUsers } from "react-icons/fi";
-import { MdAttachMoney } from "react-icons/md";
-import { useAddToCartMutation } from "@/services/cart/cartApi";
+import { MdAttachMoney, MdOutlineAddShoppingCart } from "react-icons/md";
+import {
+  useAddToCartMutation,
+  useRemoveFromCartMutation,
+} from "@/services/cart/cartApi";
 import { useSelector } from "react-redux";
+import { IoCheckmarkSharp } from "react-icons/io5";
+import { toast } from "react-hot-toast";
+import Checkout from "../checkout/Checkout";
 
-const Left = ({ tour }) => {
-  const [addToCart, { isLoading, data, error }] = useAddToCartMutation();
-  const user = useSelector((state) => state.user);
+const Left = () => {
+  const user = useSelector((state) => state?.auth);
+  const tour = useSelector((state) => state?.rent);
+
+  const [
+    addToCart,
+    { isLoading: addToCartLoading, data: addToCartData, error: addToCartError },
+  ] = useAddToCartMutation();
+
+  const [
+    removeFromCart,
+    {
+      isLoading: removeFromCartLoading,
+      data: removeFromCartData,
+      error: removeFromCartError,
+    },
+  ] = useRemoveFromCartMutation();
 
   useEffect(() => {
-    if (data) {
-      alert(data?.message);
+    if (addToCartLoading) {
+      toast.loading("Adding to cart...", { id: "add-to-cart" });
     }
-    if (error?.data) {
-      alert(error?.data?.message);
+
+    if (addToCartData) {
+      toast.success(addToCartData?.message, { id: "add-to-cart" });
     }
-  }, [data, error]);
+
+    if (addToCartError?.data) {
+      toast.error(addToCartError?.data?.message, { id: "add-to-cart" });
+    }
+
+    if (removeFromCartLoading) {
+      toast.loading("Removing from cart...", { id: "remove-from-cart" });
+    }
+
+    if (removeFromCartData) {
+      toast.success(removeFromCartData?.message, {
+        id: "remove-from-cart",
+      });
+    }
+
+    if (removeFromCartError?.data) {
+      toast.error(removeFromCartError?.data?.message, {
+        id: "remove-from-cart",
+      });
+    }
+  }, [
+    addToCartLoading,
+    addToCartData,
+    addToCartError,
+    removeFromCartLoading,
+    removeFromCartData,
+    removeFromCartError,
+  ]);
 
   function getColumnSpanClass(index, totalThumbnails) {
     if (totalThumbnails === 1 || totalThumbnails === 2) {
@@ -148,17 +196,38 @@ const Left = ({ tour }) => {
             </label>
           </div>
         </form>
-        <button
-          type="button"
-          disabled={isLoading}
-          className="bg-primary hover:bg-secondary hover:text-primary hover:border-primary border border-transparent text-white p-1.5 rounded-primary flex justify-center items-center transition-all delay-100 text-sm"
-          onClick={() => addToCart({
-            rent: tour?._id,
-            user: user?._id
-          })}
-        >
-          {isLoading ? "Loading..." : "Book Now"}
-        </button>
+        <div className="flex flex-row gap-x-2 items-center">
+          <Checkout />
+          {user?.cart?.rents?.some((rent) => rent?._id === tour?._id) ? (
+            <button
+              type="button"
+              className="bg-primary hover:bg-secondary hover:text-primary hover:border-primary border border-transparent text-white p-1.5 rounded-primary flex justify-center items-center transition-all delay-100 text-sm"
+              onClick={() => removeFromCart(tour?._id)}
+            >
+              {removeFromCartLoading ? (
+                <AiOutlineLoading3Quarters className="animate-spin h-5 w-5" />
+              ) : (
+                <IoCheckmarkSharp className="h-5 w-5" />
+              )}
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="bg-primary hover:bg-secondary hover:text-primary hover:border-primary border border-transparent text-white p-1.5 rounded-primary flex justify-center items-center transition-all delay-100 text-sm"
+              onClick={() =>
+                addToCart({
+                  rent: tour?._id,
+                })
+              }
+            >
+              {addToCartLoading ? (
+                <AiOutlineLoading3Quarters className="animate-spin h-5 w-5" />
+              ) : (
+                <MdOutlineAddShoppingCart className="h-5 w-5" />
+              )}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

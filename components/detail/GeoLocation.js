@@ -13,78 +13,48 @@
  * Date: 21, October 2023
  */
 
+import { MapContainer, Marker, TileLayer, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import useGetCountryLatLng from "@/hooks/useGetCountryLatLng";
+import { useMemo } from "react";
 
-import _ from "leaflet";
-import geocode from "@/libs/geocode";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+const GeoLocation = ({ location, zoom, height }) => {
+  const latlng = useGetCountryLatLng(location);
+  const position = useMemo(() => {
+    if (latlng) {
+      return {
+        lat: parseFloat(latlng.split(",")[0]),
+        lon: parseFloat(latlng.split(",")[1]),
+      };
+    } else {
+      return {
+        lat: 20,
+        lon: 90,
+      };
+    }
+  }, [latlng]);
 
-const GeoLocation = ({ location, zoom }) => {
-  const [center, setCenter] = useState([40.8054, -74.0241]);
-
-  useEffect(() => {
-    const fetchCoordinates = async () => {
-      try {
-        const { lat, lon } = geocode(location);
-        console.log(lat, lon, "lat, lon");
-        setCenter([lat, lon]);
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-
-    fetchCoordinates();
-  }, [location]);
-
-  const markerRef = useRef(null);
-  const eventHandlers = useMemo(
-    () => ({
-      dragend() {
-        const marker = markerRef.current;
-        if (marker != null) {
-          // setPosition(marker.getLatLng())
-          console.log(marker.getLatLng());
-        }
-      },
-    }),
-    []
-  );
-
-  useEffect(() => {
-    console.log(markerRef.current);
-  }, [markerRef.current]);
+  const key = `${position?.lat}-${position?.lon}`;
 
   return (
-    <div
-      style={{ height: "400px" }}
-      className="w-full max-w-full rounded overflow-hidden"
+    <MapContainer
+      key={key}
+      center={position}
+      zoom={zoom}
+      scrollWheelZoom={false}
+      style={{ height: height }}
+      className="w-full rounded overflow-hidden"
     >
-      <MapContainer
-        center={center}
-        zoom={zoom}
-        scrollWheelZoom={false}
-        className="w-full h-full"
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <Marker
-          eventHandlers={eventHandlers}
-          ref={markerRef}
-          position={center}
-          draggable={true}
-          animate={true}
-        >
-          <Popup>
-            {location}
-          </Popup>
-        </Marker>
-      </MapContainer>
-    </div>
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      <Marker position={[position?.lat, position?.lon]}>
+        <Popup>You found it!</Popup>
+      </Marker>
+    </MapContainer>
   );
 };
 

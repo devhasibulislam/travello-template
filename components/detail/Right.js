@@ -17,15 +17,10 @@ import React from "react";
 import { AiFillStar } from "react-icons/ai";
 import { BsSignTurnRight } from "react-icons/bs";
 import Location from "./Location";
+import { useSelector } from "react-redux";
 
-const Right = ({ tour }) => {
-  const info1 = [
-    "Must wear a mask while on location",
-    "Open only Saturday and Sunday",
-    "Age 6-45 only",
-  ];
-
-  const info2 = ["Saturday - Friday", "08:00 AM - 10:00 PM"];
+const Right = () => {
+  const tour = useSelector((state) => state?.rent);
 
   return (
     <div className="lg:col-span-7 md:col-span-6 col-span-12 flex flex-col gap-y-4">
@@ -38,20 +33,19 @@ const Right = ({ tour }) => {
             </span>
             <span className="text-xs flex items-center gap-x-1 py-0.5 px-2 bg-purple-50 text-purple-800 border border-purple-500 rounded-secondary">
               <AiFillStar className="w-4 h-4 text-yellow-500" /> (
-              {Math.floor(Math.random() * (5 - 1 + 1)) + 1}) •{" "}
-              {Math.floor(Math.random() * (500 - 100 + 1)) + 100}
+              {tour?.reviews?.length})
             </span>
           </p>
         </div>
         <div className="flex flex-col gap-y-6">
           <div className="flex flex-col gap-y-1.5">
-            <h2 className="md:text-xl text-lg">Description</h2>
-            <p className="text-sm">{tour?.description}</p>
+            <h2 className="md:text-xl text-lg">Summary</h2>
+            <p className="text-sm">{tour?.summary}</p>
           </div>
           <div className="flex flex-col gap-y-1.5">
             <h2 className="md:text-xl text-lg">Important Information</h2>
             <div className="flex flex-col gap-y-1">
-              {tour?.informationArray?.map((information, index) => (
+              {tour?.information?.map((information, index) => (
                 <p
                   key={index}
                   className="flex flex-row gap-x-2 items-start text-sm"
@@ -59,7 +53,7 @@ const Right = ({ tour }) => {
                   <span className="p-0.5">
                     <BsSignTurnRight className="h-3.5 w-3.5" />
                   </span>
-                  {information?.information}
+                  {information}
                 </p>
               ))}
             </div>
@@ -67,7 +61,7 @@ const Right = ({ tour }) => {
           <div className="flex flex-col gap-y-1.5">
             <h2 className="md:text-xl text-lg">Open Time</h2>
             <div className="flex flex-col gap-y-1">
-              {tour?.timeArray?.map((time, index) => (
+              {tour?.times?.map((time, index) => (
                 <p
                   key={index}
                   className="flex flex-row gap-x-2 items-center text-sm"
@@ -75,7 +69,7 @@ const Right = ({ tour }) => {
                   <span className="p-0.5">
                     <BsSignTurnRight className="h-3.5 w-3.5" />
                   </span>
-                  {time?.time}
+                  {time}
                 </p>
               ))}
             </div>
