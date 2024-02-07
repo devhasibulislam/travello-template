@@ -27,7 +27,7 @@ export async function signUpUser(req) {
       },
     });
 
-    const result = await user.save({ validateBeforeSave: false });
+    const result = await user.save({ validateBeforeSave: true });
 
     if (result) {
       return {
@@ -97,13 +97,9 @@ export async function forgotPassword(req) {
     if (user) {
       const hashedPassword = user.encryptPassword(req.body.password);
 
-      const result = await User.findByIdAndUpdate(
-        user._id,
-        {
-          password: hashedPassword,
-        },
-        { runValidators: false, returnOriginal: false }
-      );
+      const result = await User.findByIdAndUpdate(user._id, {
+        $set: { password: hashedPassword },
+      });
 
       if (result) {
         return {
@@ -131,9 +127,22 @@ export async function forgotPassword(req) {
 }
 
 // get persist user
-export async function getUser(req) {
+export async function persistUser(req) {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).populate([
+      {
+        path: "favorite",
+        populate: ["user", "rents"],
+      },
+      {
+        path: "cart",
+        populate: ["user", "rents"],
+      },
+      {
+        path: "reviews",
+        populate: ["reviewer", "rent"],
+      },
+    ]);
 
     if (user) {
       return {

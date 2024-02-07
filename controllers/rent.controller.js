@@ -13,15 +13,18 @@
  * Date: 17, November 2023
  */
 
+import Cart from "@/models/cart.model";
+import Favorite from "@/models/favorite.model";
+import Purchase from "@/models/purchase.model";
 import Rent from "@/models/rent.model";
+import Review from "@/models/review.model";
 import User from "@/models/user.model";
 import removePhoto from "@/utils/remove.util";
 
 // add new rent
 export async function addRent(req) {
   try {
-    const { informationArray, timeArray, duration, ...otherInformation } =
-      req.body;
+    const { duration, ...otherInformation } = req.body;
     let gallery = [];
 
     gallery = req.files.map((file) => ({
@@ -29,17 +32,18 @@ export async function addRent(req) {
       public_id: file.filename,
     }));
 
-    const rent = await Rent.create({
-      duration: JSON.parse(duration),
-      informationArray: informationArray.map((info) => JSON.parse(info)),
-      timeArray: timeArray.map((time) => JSON.parse(time)),
+    const rentInformation = {
       ...otherInformation,
       gallery,
-    });
+      duration: JSON.parse(duration),
+      owner: req.user._id,
+    };
+
+    const rent = await Rent.create(rentInformation);
 
     if (rent) {
       await rent.save();
-      await User.findByIdAndUpdate(rent.user, {
+      await User.findByIdAndUpdate(rent.owner, {
         $push: {
           rents: rent._id,
         },
@@ -52,7 +56,7 @@ export async function addRent(req) {
     } else {
       return {
         success: false,
-        message: "Rent not created",
+        message: "Failed to create rent",
       };
     }
   } catch (error) {
@@ -66,7 +70,9 @@ export async function addRent(req) {
 // get all rents
 export async function getRents() {
   try {
-    const rents = await Rent.find().populate("user").sort({ updatedAt: -1 });
+    const rents = await Rent.find()
+      .populate(["users", "owner", "reviews"])
+      .sort({ updatedAt: -1 });
 
     if (rents) {
       return {
@@ -91,7 +97,17 @@ export async function getRents() {
 // get rent
 export async function getRent(req) {
   try {
-    const rent = await Rent.findById(req.query.id);
+    const rent = await Rent.findById(req.query.id).populate([
+      "users",
+      {
+        path: "owner",
+        populate: "rents",
+      },
+      {
+        path: "reviews",
+        populate: ["reviewer", "rent"],
+      },
+    ]);
 
     if (rent) {
       return {
@@ -116,65 +132,105 @@ export async function getRent(req) {
 // update rent
 export async function updateRent(req) {
   try {
-    let rentInformation = {};
+    const rent = await Rent.findById(req.query.id);
 
-    if (req.body && req.body.status) {
-      rentInformation.status = req.body.status;
-    } else {
-      const {
-        body: {
-          oldGallery,
-          informationArray,
-          timeArray,
-          duration,
-          ...otherInformation
-        },
-        files,
-      } = req;
+    const updatedRent = req.body;
 
-      if (oldGallery) {
-        if (Array.isArray(oldGallery)) {
-          oldGallery.forEach(async (file) => {
-            await removePhoto(file);
-          });
-        } else {
-          await removePhoto(oldGallery);
-        }
-        rentInformation.gallery = files.map((file) => ({
-          url: file.path,
-          public_id: file.filename,
-        }));
-      }
+    if (req.files && req.files.length > 0) {
+      rent.gallery.forEach(
+        async (gallery) => await removePhoto(gallery?.public_id)
+      );
 
-      rentInformation = {
-        ...rentInformation,
-        duration: JSON.parse(duration),
-        informationArray: informationArray.map((info) => JSON.parse(info)),
-        timeArray: timeArray.map((time) => JSON.parse(time)),
-        ...otherInformation,
-      };
+      updatedRent.gallery = req.files.map((file) => ({
+        url: file.path,
+        public_id: file.filename,
+      }));
     }
 
-    const rent = await Rent.findByIdAndUpdate(
-      req.query.id,
-      {
-        $set: rentInformation,
-      },
-      {
-        runValidators: false,
-        returnOriginal: false,
-      }
-    );
+    updatedRent.duration = JSON.parse(req.body.duration);
 
-    if (rent) {
+    const result = await Rent.findByIdAndUpdate(rent._id, {
+      $set: updatedRent,
+    });
+
+    if (result) {
       return {
         success: true,
-        message: "Successfully updated rent information",
+        message: "Successfully updated rent",
       };
     } else {
       return {
         success: false,
-        message: "Failed to update rent information",
+        message: "Failed to update rent",
+      };
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+}
+
+// delete rent
+export async function deleteRent(req) {
+  try {
+    const rent = await Rent.findByIdAndDelete(req.query.id);
+
+    if (rent) {
+      rent.gallery.forEach(
+        async (gallery) => await removePhoto(gallery?.public_id)
+      );
+
+      // remove from owner
+      await User.findByIdAndUpdate(rent.owner, {
+        $unset: {
+          owner: rent._id,
+        },
+      });
+
+      // remove from reviews
+      if (rent.reviews.length > 0) {
+        for (let i = 0; i < rent.reviews.length; i++) {
+          const review = await Review.findByIdAndDelete(rent.reviews[i]);
+
+          // remove review from user's review array
+          await User.findByIdAndUpdate(review.user, {
+            $pull: {
+              reviews: review._id,
+            },
+          });
+        }
+      }
+
+      rent.users.forEach(async (usr) => {
+        const user = await User.findById(usr);
+
+        await Cart.findByIdAndUpdate(user.cart, {
+          $pull: {
+            rents: rent._id,
+          },
+        });
+
+        await Favorite.findByIdAndUpdate(user.favorite, {
+          $pull: {
+            rents: rent._id,
+          },
+        });
+
+        for (let i = 0; i < user.purchases.length; i++) {
+          await Purchase.findOneAndDelete({ rent: rent._id });
+        }
+      });
+
+      return {
+        success: true,
+        message: "Successfully deleted rent",
+      };
+    } else {
+      return {
+        success: false,
+        message: "Failed to delete rent",
       };
     }
   } catch (error) {
@@ -189,29 +245,29 @@ export async function updateRent(req) {
 export async function getFilteredRents(req) {
   try {
     let filter = {};
-    const parsedBody = JSON.parse(req.body);
 
-    if (parsedBody) {
-      if (parsedBody.price) {
-        filter.price = { $lte: parsedBody.price };
-      }
+    if (req.query.startDate) {
+      filter["duration.startDate"] = {
+        $gte: new Date(req.query.startDate),
+      };
+    }
 
-      if (parsedBody.type) {
-        filter.type = { $in: parsedBody.type };
-      }
+    if (req.query.endDate) {
+      filter["duration.endDate"] = {
+        $lte: new Date(req.query.endDate),
+      };
+    }
 
-      if (parsedBody.location) {
-        filter.location = { $in: parsedBody.location };
-      }
+    if (req.query.price) {
+      filter.price = { $lte: req.query.price };
+    }
 
-      if (parsedBody.startDate && parsedBody.endDate) {
-        filter["duration.startDate"] = { $gte: new Date(parsedBody.startDate) };
-        filter["duration.endDate"] = { $lte: new Date(parsedBody.endDate) };
-      } else if (parsedBody.startDate) {
-        filter["duration.startDate"] = { $gte: new Date(parsedBody.startDate) };
-      } else if (parsedBody.endDate) {
-        filter["duration.endDate"] = { $lte: new Date(parsedBody.endDate) };
-      }
+    if (req.query.location) {
+      filter.location = { $in: req.query.location };
+    }
+
+    if (req.query.type) {
+      filter.type = { $in: req.query.type };
     }
 
     const rents = await Rent.find(filter);

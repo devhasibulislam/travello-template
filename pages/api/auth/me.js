@@ -13,7 +13,7 @@
  * Date: 17, November 2023
  */
 
-import { getUser } from "@/controllers/auth.controller";
+import { persistUser } from "@/controllers/auth.controller";
 import verify from "@/middleware/verify.middleware";
 
 export const config = {
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
               error: err.message,
             });
           } else {
-            const result = await getUser(req);
+            const result = await persistUser(req);
             res.send(result);
           }
         });

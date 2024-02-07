@@ -36,7 +36,7 @@ export default async function handler(req, res) {
             });
           }
 
-          authorization("buyer")(req, res, async (err) => {
+          authorization("user")(req, res, async (err) => {
             if (err) {
               return res.send({
                 success: false,
@@ -58,8 +58,26 @@ export default async function handler(req, res) {
 
     case "GET":
       try {
-        const result = await getCart();
-        res.send(result);
+        verify(req, res, async (err) => {
+          if (err) {
+            return res.send({
+              success: false,
+              error: err.message,
+            });
+          }
+
+          authorization("user", "admin")(req, res, async (err) => {
+            if (err) {
+              return res.send({
+                success: false,
+                error: err.message,
+              });
+            }
+
+            const result = await getCart();
+            res.send(result);
+          });
+        });
       } catch (error) {
         res.send({
           success: false,

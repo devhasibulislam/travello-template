@@ -13,7 +13,7 @@
  * Date: 17, November 2023
  */
 
-import { getUser, updateUser } from "@/controllers/user.controller";
+import { deleteUser, getUser, updateUser } from "@/controllers/user.controller";
 import authorization from "@/middleware/authorization.middleware";
 import upload from "@/middleware/upload.middleware";
 import verify from "@/middleware/verify.middleware";
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
             });
           }
 
-          authorization("admin", "seller", "buyer")(req, res, async (err) => {
+          authorization("admin", "user")(req, res, async (err) => {
             if (err) {
               return res.send({
                 success: false,
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
             });
           }
 
-          authorization("admin")(req, res, async (err) => {
+          authorization("admin", "user")(req, res, async (err) => {
             if (err) {
               return res.send({
                 success: false,
@@ -88,6 +88,36 @@ export default async function handler(req, res) {
                 res.send(result);
               }
             });
+          });
+        });
+      } catch (error) {
+        res.send({
+          success: false,
+          error: error.message,
+        });
+      }
+      break;
+
+    case "DELETE":
+      try {
+        verify(req, res, async (err) => {
+          if (err) {
+            return res.send({
+              success: false,
+              error: err.message,
+            });
+          }
+
+          authorization("admin", "user")(req, res, async (err) => {
+            if (err) {
+              return res.send({
+                success: false,
+                error: err.message,
+              });
+            }
+
+            const result = await deleteUser(req);
+            res.send(result);
           });
         });
       } catch (error) {

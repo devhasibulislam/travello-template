@@ -1,5 +1,5 @@
 /**
- * Title: Write a program using JavaScript on Cart Controller
+ * Title: Write a program using JavaScript on Favorite Controller
  * Author: Hasibul Islam
  * Portfolio: https://devhasibulislam.vercel.app
  * Linkedin: https://linkedin.com/in/devhasibulislam
@@ -10,34 +10,34 @@
  * Pinterest: https://pinterest.com/devhasibulislam
  * WhatsApp: https://wa.me/8801906315901
  * Telegram: devhasibulislam
- * Date: 19, November 2023
+ * Date: 24, January 2024
  */
 
-import Cart from "@/models/cart.model";
+import Favorite from "@/models/favorite.model";
 import User from "@/models/user.model";
 
-// add to cart
-export async function addToCart(req) {
+// add to favorite
+export async function addToFavorite(req) {
   try {
-    const cart = await Cart.findOne({ user: req.user._id });
+    const favorite = await Favorite.findOne({ user: req.user._id });
     let result = {};
 
-    if (cart) {
-      result = await Cart.findOneAndUpdate(
+    if (favorite) {
+      result = await Favorite.findOneAndUpdate(
         { user: req.user._id },
         {
           $push: { rents: req.body.rent },
         }
       );
     } else {
-      result = await Cart.create({
+      result = await Favorite.create({
         user: req.user._id,
         rents: [req.body.rent],
       });
 
       await User.findByIdAndUpdate(req.user._id, {
-        $push: {
-          cart: result._id,
+        $set: {
+          favorite: result._id,
         },
       });
     }
@@ -45,12 +45,12 @@ export async function addToCart(req) {
     if (result) {
       return {
         success: true,
-        message: "Successfully added to cart",
+        message: "Successfully added to favorite",
       };
     } else {
       return {
         success: false,
-        message: "Failed to add to cart",
+        message: "Failed to add to favorite",
       };
     }
   } catch (error) {
@@ -61,21 +61,21 @@ export async function addToCart(req) {
   }
 }
 
-// get cart
-export async function getCart() {
+// get favorite
+export async function getFavorites() {
   try {
-    const cart = await Cart.find().populate(["user", "rents"]);
+    const favorite = await Favorite.find().populate(["user", "rents"]);
 
-    if (cart) {
+    if (favorite) {
       return {
         success: true,
-        message: "Successfully fetch cart",
-        data: cart,
+        message: "Successfully fetch favorites",
+        data: favorite,
       };
     } else {
       return {
         success: false,
-        message: "Failed to fetch cart",
+        message: "Failed to fetch favorites",
       };
     }
   } catch (error) {
@@ -86,12 +86,12 @@ export async function getCart() {
   }
 }
 
-// delete from cart
-export async function removeFromCart(req) {
+// delete from favorite
+export async function removeFromFavorite(req) {
   try {
     const user = await User.findById(req.user._id);
 
-    const result = await Cart.findByIdAndUpdate(user.cart, {
+    const result = await Favorite.findByIdAndUpdate(user.favorite, {
       $pull: {
         rents: req.query.id,
       },
@@ -100,12 +100,12 @@ export async function removeFromCart(req) {
     if (result) {
       return {
         success: true,
-        message: "Successfully deleted from cart",
+        message: "Successfully deleted from favorite",
       };
     } else {
       return {
         success: false,
-        message: "Failed to delete from cart",
+        message: "Failed to delete from favorite",
       };
     }
   } catch (error) {

@@ -1,5 +1,5 @@
 /**
- * Title: Write a program using JavaScript on Rent CRUD
+ * Title: Write a program using JavaScript on Create-payment-intent
  * Author: Hasibul Islam
  * Portfolio: https://devhasibulislam.vercel.app
  * Linkedin: https://linkedin.com/in/devhasibulislam
@@ -10,23 +10,24 @@
  * Pinterest: https://pinterest.com/devhasibulislam
  * WhatsApp: https://wa.me/8801906315901
  * Telegram: devhasibulislam
- * Date: 18, November 2023
+ * Date: 06, February 2024
  */
 
-import { addRent, getRents } from "@/controllers/rent.controller";
+import { createPaymentIntent } from "@/controllers/payment.controller";
 import authorization from "@/middleware/authorization.middleware";
-import upload from "@/middleware/upload.middleware";
 import verify from "@/middleware/verify.middleware";
 
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: true,
     externalResolver: true,
   },
 };
 
 export default async function handler(req, res) {
-  switch (req.method) {
+  const { method } = req;
+
+  switch (method) {
     case "POST":
       try {
         verify(req, res, async (err) => {
@@ -37,7 +38,7 @@ export default async function handler(req, res) {
             });
           }
 
-          authorization("admin", "user")(req, res, async (err) => {
+          authorization("user")(req, res, async (err) => {
             if (err) {
               return res.send({
                 success: false,
@@ -45,35 +46,14 @@ export default async function handler(req, res) {
               });
             }
 
-            upload.array("gallery", 5)(req, res, async (err) => {
-              if (err) {
-                return res.send({
-                  success: false,
-                  message: err.message,
-                });
-              }
-
-              const result = await addRent(req);
-              res.send(result);
-            });
+            const result = await createPaymentIntent(req);
+            res.send(result);
           });
         });
       } catch (error) {
         res.send({
           success: false,
           message: error.message,
-        });
-      }
-      break;
-
-    case "GET":
-      try {
-        const result = await getRents(req);
-        res.send(result);
-      } catch (error) {
-        res.send({
-          success: false,
-          error: error.message,
         });
       }
       break;
