@@ -23,7 +23,11 @@ export default function useGetCountries() {
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => {
-          return { name: country.name.common, flag: country.flags.svg };
+          return {
+            name: country.name.common,
+            flag: country.flags.svg,
+            latlng: country.latlng,
+          };
         });
 
         const sortedCountries = countries.sort((a, b) =>
