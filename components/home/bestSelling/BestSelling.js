@@ -24,7 +24,7 @@ import LoadImage from "@/components/shared/image/LoadImage";
 import SkeletonCard from "@/components/shared/card/SkeletonCard";
 import { useGetRentsQuery } from "@/services/rent/rentApi";
 
-const BestSelling = () => {
+const BestSelling = ({ className }) => {
   const { data, isLoading, error } = useGetRentsQuery();
   const tours = useMemo(() => data?.data || [], [data]);
 
@@ -36,7 +36,7 @@ const BestSelling = () => {
 
   return (
     <section id="flights" className="py-12">
-      <Container>
+      <Container className={`${className}`}>
         <section className="w-full h-full flex flex-col gap-y-12">
           <div className="flex flex-row justify-between items-center">
             <article className="flex flex-col gap-y-4">
