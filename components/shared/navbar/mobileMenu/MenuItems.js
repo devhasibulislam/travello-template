@@ -19,7 +19,7 @@ import OutsideClick from "../../outsideClick/OutsideClick";
 import { useSelector } from "react-redux";
 
 const MenuItems = ({ isOpen, setIsOpen }) => {
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state?.auth);
   const handleOutsideClick = () => {
     setIsOpen(!isOpen);
   };
@@ -27,31 +27,6 @@ const MenuItems = ({ isOpen, setIsOpen }) => {
   const menuItems = [
     {
       id: 1,
-      name: "Home",
-      href: "/",
-    },
-    {
-      id: 2,
-      name: "Flights",
-      href: "/flights",
-    },
-    {
-      id: 3,
-      name: "Hotels",
-      href: "/hotels",
-    },
-    {
-      id: 4,
-      name: "Deals",
-      href: "/deals",
-    },
-    {
-      id: 5,
-      name: "Blogs",
-      href: "/blogs",
-    },
-    {
-      id: 6,
       name: "Dashboard",
       href: "/dashboard",
     },
@@ -59,12 +34,12 @@ const MenuItems = ({ isOpen, setIsOpen }) => {
 
   const userItems = [
     {
-      id: 1,
+      id: 2,
       name: "Sign Up",
       href: "/auth/signup",
     },
     {
-      id: 2,
+      id: 3,
       name: "Sign In",
       href: "/auth/signin",
     },
@@ -73,36 +48,43 @@ const MenuItems = ({ isOpen, setIsOpen }) => {
   return (
     isOpen && (
       <OutsideClick onOutsideClick={handleOutsideClick}>
-        <section className="absolute top-full right-0 w-40 mt-2">
-          <div className="w-full h-full bg-secondary shadow rounded-primary border border-primary/20">
+        <section className="absolute top-full right-0 w-40 mt-2 z-50">
+          <div className="w-full h-full bg-secondary shadow rounded border border-primary/20">
             <div className="flex flex-col gap-y-3 py-primary">
-              <div className="flex flex-col gap-y-2 px-secondary">
-                {menuItems.map(({ id, name, href }) => (
-                  <Link
-                    key={id}
-                    href={href}
-                    className="flex justify-between group text-sm"
-                  >
-                    {name}{" "}
-                    <span className="group-hover:opacity-100 opacity-5 font-bold">
-                      →
-                    </span>
-                  </Link>
-                ))}
-              </div>
-              <hr className="border-primary/20" />
+              {Object.keys(user).length > 0 && (
+                <>
+                  <div className="flex flex-col gap-y-2 px-secondary">
+                    {menuItems.map(({ id, name, href }) => (
+                      <Link
+                        key={id}
+                        href={href}
+                        className="flex justify-between group text-sm"
+                      >
+                        {name}{" "}
+                        <span className="group-hover:opacity-100 opacity-5 font-bold">
+                          →
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                  <hr className="border-primary/20" />
+                </>
+              )}
               <div className="flex flex-col gap-y-2 px-secondary">
                 {localStorage.getItem("accessToken") &&
                 Object.keys(user).length > 0 ? (
                   <button
                     type="button"
-                    className="text-sm"
+                    className="flex justify-between group text-sm"
                     onClick={() => {
                       localStorage.removeItem("accessToken");
                       window.location.reload();
                     }}
                   >
-                    Logout
+                    Logout{" "}
+                    <span className="group-hover:opacity-100 opacity-5 font-bold">
+                      →
+                    </span>
                   </button>
                 ) : (
                   userItems.map(({ id, name, href }) => (
