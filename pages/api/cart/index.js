@@ -36,7 +36,7 @@ export default async function handler(req, res) {
             });
           }
 
-          authorization("user")(req, res, async (err) => {
+          authorization("user", "admin")(req, res, async (err) => {
             if (err) {
               return res.send({
                 success: false,
