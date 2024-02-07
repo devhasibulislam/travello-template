@@ -102,7 +102,7 @@ const TravelDate = () => {
                   type="date"
                   name="startDate"
                   id="startDate"
-                  className="flex-1 rounded-secondary !py-0.5"
+                  className="flex-1 rounded-secondary !py-0.5 text-xs"
                   value={startDate.toISOString().split("T")[0]}
                   onChange={(e) => setStartDate(new Date(e.target.value))}
                 />
@@ -116,7 +116,7 @@ const TravelDate = () => {
                   type="date"
                   name="endDate"
                   id="endDate"
-                  className="flex-1 rounded-secondary !py-0.5"
+                  className="flex-1 rounded-secondary !py-0.5 text-xs"
                   value={endDate.toISOString().split("T")[0]}
                   onChange={(e) => setEndDate(new Date(e.target.value))}
                 />
