@@ -20,35 +20,41 @@ import LoadImage from "../shared/image/LoadImage";
 import { useForm } from "react-hook-form";
 import { GrCloudUpload } from "react-icons/gr";
 import { useSelector } from "react-redux";
+import { toast } from "react-hot-toast";
 
-const UpdateUser = () => {
-  const user = useSelector((state) => state?.auth);
-  const [
-    updateInformation,
-    {
-      isLoading: updatingUserData,
-      data: updatedUserData,
-      error: updatedUserDataError,
-    },
-  ] = useUpdateUserMutation();
+const UpdateUser = ({ setIsOpen }) => {
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const user = useSelector((state) => state?.user);
+  const [updateUser, { isLoading, data, error }] = useUpdateUserMutation();
 
   useEffect(() => {
-    if (updatedUserData) {
-      alert(updatedUserData?.message);
+    if (isLoading) {
+      toast.loading("Updating User Information...", {
+        id: "updateUser",
+      });
     }
-    if (updatedUserDataError?.data) {
-      alert(updatedUserDataError?.data?.message);
-    }
-  }, [updatedUserData, updatedUserDataError]);
 
-  const [avatarPreview, setAvatarPreview] = useState(null);
+    if (data) {
+      toast.success(data?.message, { id: "updateUser" });
+      setIsOpen(false);
+    }
+
+    if (error?.data) {
+      toast.error(error?.data?.message, {
+        id: "updateUser",
+      });
+    }
+  }, [data, error, isLoading]);
+
   const { register, handleSubmit } = useForm({
     defaultValues: {
       name: user?.name,
       email: user?.email,
       phone: user?.phone,
       avatar: user?.avatar,
+      address: user?.address,
       role: user?.role,
+      status: user?.status,
     },
   });
 
@@ -72,15 +78,16 @@ const UpdateUser = () => {
 
     formData.append("name", data.name);
     formData.append("email", data.email);
-    formData.append("role", data.role);
     formData.append("phone", data.phone);
+    formData.append("role", data.role);
+    formData.append("status", data.status);
+    formData.append("address", data.address);
 
-    if (avatarPreview) {
+    if (avatarPreview !== null && data.avatar[0]) {
       formData.append("avatar", data.avatar[0]);
-      formData.append("oldAvatar", user?.avatar?.public_id);
     }
 
-    updateInformation({ id: user?._id, body: formData });
+    updateUser({ id: user?._id, body: formData });
   };
 
   return (
@@ -105,7 +112,7 @@ const UpdateUser = () => {
             />
             <div className="absolute top-1 right-1 w-8 h-8 border rounded-secondary bg-primary">
               <div className="relative flex justify-center items-center w-full h-full">
-                <span className="rounded-secondary">
+                <span className="rounded-secondary text-white">
                   <GrCloudUpload className="h-5 w-5" />
                   <input
                     type="file"
@@ -124,8 +131,9 @@ const UpdateUser = () => {
           </div>
         )}
       </label>
+
       <label htmlFor="name" className="flex flex-col gap-y-1">
-        <span className="text-sm">Modify Your Name</span>
+        <span className="text-sm">Modify Name</span>
         <input
           type="text"
           name="name"
@@ -135,8 +143,9 @@ const UpdateUser = () => {
           className=""
         />
       </label>
+
       <label htmlFor="email" className="flex flex-col gap-y-1">
-        <span className="text-sm">Modify Your Email</span>
+        <span className="text-sm">Modify Email</span>
         <input
           type="email"
           name="email"
@@ -146,15 +155,25 @@ const UpdateUser = () => {
           className=""
         />
       </label>
+
       <label htmlFor="role" className="flex flex-col gap-y-1">
-        <span className="text-sm">Modify Your Role</span>
+        <span className="text-sm">Modify Role</span>
         <select name="role" id="role" {...register("role")} className="">
-          <option value="seller">Seller</option>
-          <option value="buyer">Buyer</option>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
         </select>
       </label>
+
+      <label htmlFor="status" className="flex flex-col gap-y-1">
+        <span className="text-sm">Modify Status</span>
+        <select name="status" id="status" {...register("status")} className="">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </label>
+
       <label htmlFor="phone" className="flex flex-col gap-y-1">
-        <span className="text-sm">Modify Your Phone Number</span>
+        <span className="text-sm">Modify Phone Number</span>
         <input
           type="tel"
           name="phone"
@@ -164,8 +183,22 @@ const UpdateUser = () => {
           className=""
         />
       </label>
-      <Button type="submit" disabled={updatingUserData} className="py-2">
-        {updatingUserData ? "Loading..." : "Update Profile"}
+
+      <label htmlFor="address" className="flex flex-col gap-y-1">
+        <span className="text-sm">Modify Address*</span>
+        <textarea
+          name="address"
+          id="address"
+          rows="2"
+          maxLength={500}
+          placeholder="Type your address here..."
+          className="rounded"
+          {...register("address", { required: true })}
+        ></textarea>
+      </label>
+
+      <Button type="submit" disabled={isLoading} className="py-2">
+        {isLoading ? "Loading..." : "Update Profile"}
       </Button>
     </form>
   );
