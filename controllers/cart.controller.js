@@ -36,7 +36,7 @@ export async function addToCart(req) {
       });
 
       await User.findByIdAndUpdate(req.user._id, {
-        $push: {
+        $set: {
           cart: result._id,
         },
       });
@@ -64,7 +64,13 @@ export async function addToCart(req) {
 // get cart
 export async function getCart() {
   try {
-    const cart = await Cart.find().populate(["user", "rents"]);
+    const cart = await Cart.find().populate([
+      "user",
+      {
+        path: "rents",
+        populate: ["owner"],
+      },
+    ]);
 
     if (cart) {
       return {

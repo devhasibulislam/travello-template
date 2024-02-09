@@ -132,16 +132,39 @@ export async function persistUser(req) {
     const user = await User.findById(req.user._id).populate([
       {
         path: "favorite",
-        populate: ["user", "rents"],
+        populate: [
+          "user",
+          {
+            path: "rents",
+            populate: ["owner"],
+          },
+        ],
       },
       {
         path: "cart",
-        populate: ["user", "rents"],
+        populate: [
+          "user",
+          {
+            path: "rents",
+            populate: ["owner"],
+          },
+        ],
       },
       {
         path: "reviews",
         populate: ["reviewer", "rent"],
       },
+      {
+        path: "purchases",
+        populate: [
+          "user",
+          {
+            path: "rent",
+            populate: ["users", "owner", "reviews"],
+          },
+        ],
+      },
+      "rents",
     ]);
 
     if (user) {

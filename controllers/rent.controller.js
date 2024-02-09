@@ -182,10 +182,10 @@ export async function deleteRent(req) {
         async (gallery) => await removePhoto(gallery?.public_id)
       );
 
-      // remove from owner
+      // remove from owner's rents
       await User.findByIdAndUpdate(rent.owner, {
-        $unset: {
-          owner: rent._id,
+        $pull: {
+          rents: rent._id,
         },
       });
 
@@ -203,25 +203,31 @@ export async function deleteRent(req) {
         }
       }
 
-      rent.users.forEach(async (usr) => {
-        const user = await User.findById(usr);
-
-        await Cart.findByIdAndUpdate(user.cart, {
+      // remove from all users cart
+      await Cart.updateMany(
+        {},
+        {
           $pull: {
             rents: rent._id,
           },
-        });
-
-        await Favorite.findByIdAndUpdate(user.favorite, {
-          $pull: {
-            rents: rent._id,
-          },
-        });
-
-        for (let i = 0; i < user.purchases.length; i++) {
-          await Purchase.findOneAndDelete({ rent: rent._id });
         }
-      });
+      );
+
+      // remove from all users favorite list
+      await Favorite.updateMany(
+        {},
+        {
+          $pull: {
+            rents: rent._id,
+          },
+        }
+      );
+
+      // remove from purchase list
+      await Purchase.deleteMany({ rent: rent._id });
+
+      // remove from reviews list
+      await Review.deleteMany({ rent: rent._id });
 
       return {
         success: true,

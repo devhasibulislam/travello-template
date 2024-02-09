@@ -64,7 +64,13 @@ export async function addToFavorite(req) {
 // get favorite
 export async function getFavorites() {
   try {
-    const favorite = await Favorite.find().populate(["user", "rents"]);
+    const favorite = await Favorite.find().populate([
+      "user",
+      {
+        path: "rents",
+        populate: ["owner"],
+      },
+    ]);
 
     if (favorite) {
       return {

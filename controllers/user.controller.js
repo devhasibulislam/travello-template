@@ -13,6 +13,7 @@
  * Date: 17, November 2023
  */
 
+import Cart from "@/models/cart.model";
 import Favorite from "@/models/favorite.model";
 import Purchase from "@/models/purchase.model";
 import Rent from "@/models/rent.model";
@@ -148,46 +149,52 @@ export async function deleteUser(req) {
             async (image) => await removePhoto(image.public_id)
           );
 
-          // remove from user's rent array
-          await User.findByIdAndUpdate(rent.user, {
-            $pull: {
-              rents: rent._id,
-            },
-          });
+          // remove from all users cart
+          await Cart.updateMany(
+            {},
+            {
+              $pull: {
+                rents: rent._id,
+              },
+            }
+          );
 
-          // remove from reviews
-          if (rent.reviews.length > 0) {
-            for (let i = 0; i < rent.reviews.length; i++) {
-              const review = await Review.findByIdAndDelete(rent.reviews[i]);
+          // remove from all users favorite list
+          await Favorite.updateMany(
+            {},
+            {
+              $pull: {
+                rents: rent._id,
+              },
+            }
+          );
 
-              // remove review from user's review array
-              await User.findByIdAndUpdate(review.user, {
+          //
+          rent.users.forEach(async (user) => {
+            const review = await Review.findOne({ reviewer: user });
+            const purchase = await Purchase.findOne({ user: user });
+
+            if (review) {
+              await User.findByIdAndUpdate(review.reviewer, {
                 $pull: {
-                  reviews: review._id,
+                  reviews: review?._id,
                 },
               });
             }
-          }
 
-          // remove from users cart, favorite and purchases where cart, favorite is objectID and purchases is an array of objectID
-          rent.users.forEach(async (usr) => {
-            const user = await User.findById(usr);
-
-            await Cart.findByIdAndUpdate(user.cart, {
-              $pull: {
-                rents: rent._id,
-              },
-            });
-
-            await Favorite.findByIdAndUpdate(user.favorite, {
-              $pull: {
-                rents: rent._id,
-              },
-            });
-
-            for (let i = 0; i < user.purchases.length; i++) {
-              await Purchase.findOneAndDelete({ rent: rent._id });
+            if (purchase) {
+              await User.findByIdAndUpdate(purchase.user, {
+                $pull: {
+                  purchases: purchase?._id,
+                },
+              });
             }
+
+            // remove from purchase list
+            await Purchase.deleteMany({ rent: rent._id });
+
+            // remove from reviews list
+            await Review.deleteMany({ rent: rent._id });
           });
         }
       }
