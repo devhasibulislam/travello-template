@@ -37,6 +37,12 @@ const purchaseSchema = new Schema(
     },
 
     price: Number,
+    members: Number,
+
+    duration: {
+      startDate: Date,
+      endDate: Date,
+    },
 
     createdAt: {
       type: Date,
