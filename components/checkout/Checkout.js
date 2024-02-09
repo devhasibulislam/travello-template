@@ -19,7 +19,7 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 );
 
-const Checkout = () => {
+const Checkout = ({ members, duration }) => {
   const rent = useSelector((state) => state?.rent);
   const [isOpen, setIsOpen] = useState(false);
   const [clientSecret, setClientSecret] = useState("");
@@ -54,11 +54,11 @@ const Checkout = () => {
   return (
     <>
       <button
-        type="button"
+        type="submit"
         className="bg-primary hover:bg-secondary hover:text-primary hover:border-primary border border-transparent text-white p-1.5 rounded-primary flex justify-center items-center transition-all delay-100 text-sm w-full"
         onClick={() => {
           createPaymentIntent({
-            price: rent?.price * rent?.members,
+            price: rent?.price * members,
           });
           setIsOpen(true);
         }}
@@ -109,12 +109,12 @@ const Checkout = () => {
                   </p>
                   <p className="flex flex-row justify-between items-center">
                     <span className="">Overall Members</span>
-                    <span className="">{rent?.members}</span>
+                    <span className="">{members}</span>
                   </p>
                   <hr />
                   <p className="flex flex-row justify-between items-center">
                     <span className="">Total Cost ($)</span>
-                    <span className="">{rent?.members * rent?.price}</span>
+                    <span className="">{members * rent?.price}</span>
                   </p>
                 </div>
               </article>
@@ -188,6 +188,7 @@ function CheckoutForm() {
           integratePurchase({
             rent: rent?._id,
             price: rent?.price * rent?.members,
+            duration
           });
           setMessage("Just one more step. Your payment was successful!");
           break;
@@ -215,7 +216,7 @@ function CheckoutForm() {
 
     setIsLoading(true);
 
-    const result = await stripe
+    await stripe
       .confirmPayment({
         elements,
         confirmParams: {
