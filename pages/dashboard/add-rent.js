@@ -67,6 +67,7 @@ const AddRent = () => {
     if (data) {
       toast.success(data?.message, { id: "add-rent" });
       setGalleryPreview([]);
+      setCountry("Bangladesh");
       reset();
     }
 

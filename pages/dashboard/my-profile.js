@@ -236,6 +236,7 @@ function RemoveInformation({ id }) {
     if (deleteData) {
       toast.success(deleteData?.message, { id: "deleteUser" });
       setIsOpen(false);
+      window.open("/", "_self");
     }
 
     if (deleteError?.data) {
