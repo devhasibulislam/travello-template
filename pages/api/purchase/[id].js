@@ -1,5 +1,5 @@
 /**
- * Title: Write a program using JavaScript on Add Cart
+ * Title: Write a program using JavaScript on [id]
  * Author: Hasibul Islam
  * Portfolio: https://devhasibulislam.vercel.app
  * Linkedin: https://linkedin.com/in/devhasibulislam
@@ -10,10 +10,10 @@
  * Pinterest: https://pinterest.com/devhasibulislam
  * WhatsApp: https://wa.me/8801906315901
  * Telegram: devhasibulislam
- * Date: 19, November 2023
+ * Date: 08, February 2024
  */
 
-import { addToCart, getCart } from "@/controllers/cart.controller";
+import { modifyPurchaseStatus, removeFromPurchase } from "@/controllers/purchase.controller";
 import authorization from "@/middleware/authorization.middleware";
 import verify from "@/middleware/verify.middleware";
 
@@ -26,7 +26,7 @@ export const config = {
 
 export default async function handler(req, res) {
   switch (req.method) {
-    case "POST":
+    case "PATCH":
       try {
         verify(req, res, async (err) => {
           if (err) {
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
               });
             }
 
-            const result = await addToCart(req);
+            const result = await modifyPurchaseStatus(req);
             res.send(result);
           });
         });
@@ -56,7 +56,7 @@ export default async function handler(req, res) {
       }
       break;
 
-    case "GET":
+    case "DELETE":
       try {
         verify(req, res, async (err) => {
           if (err) {
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
             });
           }
 
-          authorization("admin")(req, res, async (err) => {
+          authorization("user", "admin")(req, res, async (err) => {
             if (err) {
               return res.send({
                 success: false,
@@ -74,7 +74,7 @@ export default async function handler(req, res) {
               });
             }
 
-            const result = await getCart();
+            const result = await removeFromPurchase(req);
             res.send(result);
           });
         });

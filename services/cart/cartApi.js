@@ -36,6 +36,9 @@ const cartApi = travelloApi.injectEndpoints({
       query: () => ({
         url: "/cart/",
         method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
       }),
 
       providesTags: ["Cart"],

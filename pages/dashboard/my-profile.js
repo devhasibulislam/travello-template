@@ -337,6 +337,7 @@ function RemoveInformation({ id }) {
               </button>
               <button
                 type="button"
+                disabled={user?.role === "admin"}
                 className="flex flex-row items-center gap-x-0.5 bg-green-100/50 border border-green-900 text-green-900 px-2 py-1 rounded uppercase"
                 onClick={() => deleteUser(id)}
               >

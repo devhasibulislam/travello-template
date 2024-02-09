@@ -13,7 +13,7 @@
  * Date: 18, November 2023
  */
 
-import { getRent, updateRent } from "@/controllers/rent.controller";
+import { deleteRent, getRent, updateRent } from "@/controllers/rent.controller";
 import authorization from "@/middleware/authorization.middleware";
 import upload from "@/middleware/upload.middleware";
 import verify from "@/middleware/verify.middleware";

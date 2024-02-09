@@ -21,7 +21,7 @@ import { FiEdit3 } from "react-icons/fi";
 import Modal from "@/components/shared/modal/Modal";
 import UpdateUser from "@/components/dashboard/UpdateUser";
 import { useMemo } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Panel from "@/layouts/Panel";
 import { setUser } from "@/features/user/userSlice";
 import DeleteUser from "@/components/dashboard/DeleteUser";
@@ -29,6 +29,7 @@ import DeleteUser from "@/components/dashboard/DeleteUser";
 const ListUsers = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data, isLoading, error } = useGetUsersQuery();
+  const usr = useSelector((state) => state?.auth);
   const users = useMemo(() => data?.data || [], [data]);
   const dispatch = useDispatch();
 
@@ -144,20 +145,29 @@ const ListUsers = () => {
                         scope="row"
                         className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                       >
-                        <span className="flex flex-row items-center gap-x-2">
-                          <button
-                            type="button"
-                            className="p-1 rounded-secondary bg-primary !text-white"
-                            onClick={() => {
-                              setIsOpen(true);
-                              dispatch(setUser(user));
-                            }}
+                        {usr?.role === "admin" ? (
+                          <span className="flex flex-row items-center gap-x-2">
+                            <button
+                              type="button"
+                              className="p-1 rounded-secondary bg-primary !text-white"
+                              onClick={() => {
+                                setIsOpen(true);
+                                dispatch(setUser(user));
+                              }}
+                            >
+                              <FiEdit3 className="w-5 h-5" />
+                            </button>
+                            <div className="h-6 w-[1px] border-l" />
+                            <DeleteUser id={user?._id} />
+                          </span>
+                        ) : (
+                          <span
+                            className="border border-cyan-900 text-cyan-900 bg-cyan-100/50 px-2 py-0 rounded uppercase"
+                            style={{ fontSize: "8px" }}
                           >
-                            <FiEdit3 className="w-5 h-5" />
-                          </button>
-                          <div className="h-6 w-[1px] border-l" />
-                          <DeleteUser id={user?._id} />
-                        </span>
+                            admin
+                          </span>
+                        )}
                       </td>
                     </tr>
                   </>

@@ -27,21 +27,55 @@ const paymentApi = travelloApi.injectEndpoints({
         },
         body,
       }),
+
+      invalidatesTags: ["Rent", "User"],
     }),
 
-    // integrate payment to purchase
-    integratePurchase: build.mutation({
-      query: (body) => ({
-        url: "/purchase/",
-        method: "POST",
+    // modify purchase status
+    modifyPurchaseStatus: build.mutation({
+      query: ({ id, body }) => ({
+        url: `/purchase/${id}`,
+        method: "PATCH",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         body,
       }),
+
+      invalidatesTags: ["Rent", "User"],
+    }),
+
+    // get purchases
+    getPurchases: build.query({
+      query: () => ({
+        url: "/purchase/",
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+
+      providesTags: ["Rent", "User"],
+    }),
+
+    // delete purchase
+    removeFromPurchase: build.mutation({
+      query: (id) => ({
+        url: `/purchase/${id}`,
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+
+      invalidatesTags: ["Rent", "User"],
     }),
   }),
 });
 
-export const { useCreatePaymentIntentMutation, useIntegratePurchaseMutation } =
-  paymentApi;
+export const {
+  useCreatePaymentIntentMutation,
+  useModifyPurchaseStatusMutation,
+  useGetPurchasesQuery,
+  useRemoveFromPurchaseMutation,
+} = paymentApi;

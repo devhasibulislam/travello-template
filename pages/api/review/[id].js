@@ -16,7 +16,7 @@
 import {
   modifyReview,
   removeFromReview,
-} from "@/controllers/favorite.controller";
+} from "@/controllers/review.controller";
 import authorization from "@/middleware/authorization.middleware";
 import verify from "@/middleware/verify.middleware";
 

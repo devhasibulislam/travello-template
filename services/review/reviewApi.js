@@ -37,6 +37,8 @@ const reviewApi = travelloApi.injectEndpoints({
         url: "/review/",
         method: "GET",
       }),
+
+      providesTags: ["Review", "User", "Rent"],
     }),
 
     // modify review
@@ -72,4 +74,5 @@ export const {
   useAddReviewMutation,
   useGetAllReviewsQuery,
   useModifyReviewMutation,
+  useDeleteReviewMutation,
 } = reviewApi;

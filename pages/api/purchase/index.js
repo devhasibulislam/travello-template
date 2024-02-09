@@ -13,7 +13,7 @@
  * Date: 24, January 2024
  */
 
-import { addToPurchase, getPurchases } from "@/controllers/purchase.controller";
+import { getPurchases } from "@/controllers/purchase.controller";
 import authorization from "@/middleware/authorization.middleware";
 import verify from "@/middleware/verify.middleware";
 
@@ -26,36 +26,6 @@ export const config = {
 
 export default async function handler(req, res) {
   switch (req.method) {
-    case "POST":
-      try {
-        verify(req, res, async (err) => {
-          if (err) {
-            return res.send({
-              success: false,
-              error: err.message,
-            });
-          }
-
-          authorization("user", "admin")(req, res, async (err) => {
-            if (err) {
-              return res.send({
-                success: false,
-                error: err.message,
-              });
-            }
-
-            const result = await addToPurchase(req);
-            res.send(result);
-          });
-        });
-      } catch (error) {
-        res.send({
-          success: false,
-          message: error.message,
-        });
-      }
-      break;
-
     case "GET":
       try {
         verify(req, res, async (err) => {
