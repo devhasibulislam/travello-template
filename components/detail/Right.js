@@ -18,6 +18,7 @@ import { AiFillStar } from "react-icons/ai";
 import { BsSignTurnRight } from "react-icons/bs";
 import Location from "./Location";
 import { useSelector } from "react-redux";
+import { FaUsers } from "react-icons/fa";
 
 const Right = () => {
   const tour = useSelector((state) => state?.rent);
@@ -34,6 +35,10 @@ const Right = () => {
             <span className="text-xs flex items-center gap-x-1 py-0.5 px-2 bg-purple-50 text-purple-800 border border-purple-500 rounded-secondary">
               <AiFillStar className="w-4 h-4 text-yellow-500" /> (
               {tour?.reviews?.length})
+            </span>
+            <span className="text-xs flex items-center gap-x-1 py-0.5 px-2 bg-indigo-50 text-indigo-800 border border-indigo-500 rounded-secondary">
+              <FaUsers className="w-4 h-4 text-yellow-500" /> (
+              {tour?.users?.length})
             </span>
           </p>
         </div>
