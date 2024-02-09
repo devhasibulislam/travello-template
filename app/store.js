@@ -14,6 +14,7 @@
  */
 
 import authSlice from "@/features/auth/authSlice";
+import bookingSlice from "@/features/booking/bookingSlice";
 import rentSlice from "@/features/rent/rentSlice";
 import rentFilterSlice from "@/features/rentFilter/rentFilterSlice";
 import travelAvailabilitySlice from "@/features/travelAvailability/travelAvailabilitySlice";
@@ -25,11 +26,12 @@ import { setupListeners } from "@reduxjs/toolkit/dist/query";
 export const store = configureStore({
   reducer: {
     [travelloApi.reducerPath]: travelloApi.reducer,
-    travelAvailability: travelAvailabilitySlice,
-    rentFilter: rentFilterSlice,
     user: userSlice,
     auth: authSlice,
     rent: rentSlice,
+    availability: travelAvailabilitySlice,
+    booking: bookingSlice,
+    filter: rentFilterSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(travelloApi.middleware),
