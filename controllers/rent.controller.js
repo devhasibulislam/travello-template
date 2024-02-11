@@ -249,31 +249,33 @@ export async function deleteRent(req) {
 
 // get filtered rents
 export async function getFilteredRents(req) {
+  console.log(req.body);
+
   try {
     let filter = {};
 
-    if (req.query.startDate) {
+    if (req.body.startDate) {
       filter["duration.startDate"] = {
-        $gte: new Date(req.query.startDate),
+        $gte: new Date(req.body.dateRange.startDate),
       };
     }
 
-    if (req.query.endDate) {
+    if (req.body.endDate) {
       filter["duration.endDate"] = {
-        $lte: new Date(req.query.endDate),
+        $lte: new Date(req.body.dateRange.endDate),
       };
     }
 
-    if (req.query.price) {
-      filter.price = { $lte: req.query.price };
+    if (req.body.price) {
+      filter.price = { $lte: req.body.priceRange.min };
     }
 
-    if (req.query.location) {
-      filter.location = { $in: req.query.location };
+    if (req.body.countries) {
+      filter.location = { $in: req.body.countries };
     }
 
-    if (req.query.type) {
-      filter.type = { $in: req.query.type };
+    if (req.body.category) {
+      filter.type = { $in: req.body.category };
     }
 
     const rents = await Rent.find(filter);
