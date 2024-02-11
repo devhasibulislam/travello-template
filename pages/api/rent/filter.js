@@ -26,7 +26,7 @@ import {
   
   export default async function handler(req, res) {
     switch (req.method) {
-      case "GET":
+      case "PATCH":
         try {
           const result = await getFilteredRents(req);
           res.send(result);

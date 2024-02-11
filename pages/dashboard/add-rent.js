@@ -67,6 +67,7 @@ const AddRent = () => {
     if (data) {
       toast.success(data?.message, { id: "add-rent" });
       setGalleryPreview([]);
+      setCountry("Bangladesh");
       reset();
     }
 
@@ -214,6 +215,8 @@ const AddRent = () => {
             id="price"
             placeholder="Type rent price here..."
             className="rounded"
+            min={5}
+            max={500}
             {...register("price", { required: true })}
           />
         </label>

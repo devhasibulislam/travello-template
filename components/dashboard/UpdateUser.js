@@ -44,7 +44,7 @@ const UpdateUser = ({ setIsOpen }) => {
         id: "updateUser",
       });
     }
-  }, [data, error, isLoading]);
+  }, [data, error, isLoading, setIsOpen]);
 
   const { register, handleSubmit } = useForm({
     defaultValues: {

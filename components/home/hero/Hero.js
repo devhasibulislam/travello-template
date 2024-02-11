@@ -17,7 +17,6 @@ import Container from "@/components/shared/container/Container";
 import React from "react";
 import HeroDescription from "./HeroDescription";
 import HeroSlider from "./HeroSlider";
-import TravelAvailability from "./travelAvailability/TravelAvailability";
 
 const Hero = () => {
   return (
@@ -29,13 +28,10 @@ const Hero = () => {
     >
       <Container>
         <div className="flex flex-col gap-y-12">
-          <div
-            className="grid md:grid-cols-12 md:items-center gap-12 grid-cols-1"
-          >
+          <div className="grid md:grid-cols-12 md:items-center gap-12 grid-cols-1">
             <HeroDescription />
             <HeroSlider />
           </div>
-          <TravelAvailability />
         </div>
       </Container>
     </section>
