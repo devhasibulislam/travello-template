@@ -80,8 +80,8 @@ const SearchFilter = ({ setIsModalOpen }) => {
   };
 
   return (
-    <section>
-      <div className="flex flex-col gap-y-6">
+      <>
+        {" "}
         <input
           type="search"
           name="search"
@@ -91,8 +91,7 @@ const SearchFilter = ({ setIsModalOpen }) => {
           onChange={handleSearch}
           autoComplete="off"
         />
-
-        <div className="flex flex-col gap-y-2.5 max-h-96 overflow-y-auto">
+        <div className="flex flex-col gap-y-2.5 h-full overflow-y-auto">
           {filteredTravels.length === 0 ? (
             <p className="text-sm text-red-500">No rents found!</p>
           ) : (
@@ -107,7 +106,7 @@ const SearchFilter = ({ setIsModalOpen }) => {
               return (
                 <article
                   key={_id}
-                  className="flex flex-col gap-y-0.5 cursor-pointer"
+                  className="flex flex-col gap-y-0.5 cursor-pointer bg-slate-50 p-2.5 rounded"
                   onClick={() => {
                     router.push(
                       `/tours/${_id}?tour_title=${title
@@ -127,7 +126,9 @@ const SearchFilter = ({ setIsModalOpen }) => {
                     dangerouslySetInnerHTML={{ __html: highlightedDescription }}
                   />
                   <p className="flex flex-row gap-x-2 mt-1">
-                    <span className="text-xs border border-cyan-900 px-2 rounded">${price}/night</span>
+                    <span className="text-xs border border-cyan-900 px-2 rounded">
+                      ${price}/night
+                    </span>
                     <span
                       className="text-end text-xs text-gray-500 line-clamp-1 border border-teal-900 px-2 rounded"
                       dangerouslySetInnerHTML={{ __html: highlightedCountry }}
@@ -138,8 +139,7 @@ const SearchFilter = ({ setIsModalOpen }) => {
             })
           )}
         </div>
-      </div>
-    </section>
+      </>
   );
 };
 
