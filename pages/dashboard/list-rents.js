@@ -212,7 +212,7 @@ function AdminRows() {
     if (error?.data) {
       toast.error(error?.data?.message, { id: "fetch-rents" });
     }
-  }, [error, data]);
+  }, [error, data, isLoading]);
 
   return (
     <>

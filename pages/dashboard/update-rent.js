@@ -65,7 +65,7 @@ const UpdateRent = () => {
     if (rentError) {
       toast.error(rentError?.data?.message, { id: "fetch-rent" });
     }
-  }, [rentUpdating, rentUpdateData, rentUpdateError, rentError]);
+  }, [rentUpdating, rentUpdateData, rentUpdateError, rentError, rentData]);
 
   function formatDate(dateString) {
     const date = new Date(dateString);

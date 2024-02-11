@@ -33,7 +33,7 @@ const MoreRents = ({ className }) => {
         <section className="w-full h-full flex flex-col gap-y-12">
           <article className="flex flex-col gap-y-4">
             <h1 className="lg:text-5xl md:text-4xl text-3xl whitespace-normal">
-              <HighlightText>Same</HighlightText> Seller's
+              <HighlightText>Same</HighlightText> Seller&lsquo;s
               <LoadImage
                 src="/assets/home-page/destination/underline.svg"
                 alt="arrow"

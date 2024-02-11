@@ -130,7 +130,7 @@ const DeleteUser = ({ id }) => {
               </div>
               <div className="text-sm flex flex-col gap-y-2.5">
                 <p className="flex flex-row gap-x-1 items-center">
-                  <MdWarningAmber className="w-5 h-5" /> This action can't be
+                  <MdWarningAmber className="w-5 h-5" /> This action can&lsquo;t be
                   undone!
                 </p>
                 <p className="flex flex-row gap-x-1 items-center">

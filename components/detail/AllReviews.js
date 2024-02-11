@@ -62,7 +62,7 @@ const AllReviews = ({ className }) => {
         id: "add-review",
       });
     }
-  }, [data, error, isLoading]);
+  }, [data, error, isLoading, reset]);
 
   const [sliderRef] = useKeenSlider({
     loop: true,

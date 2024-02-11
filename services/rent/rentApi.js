@@ -101,10 +101,10 @@ const rentApi = travelloApi.injectEndpoints({
 
     // get filtered rents
     getFilteredRents: builder.mutation({
-      query: ({ body }) => ({
-        url: "/rent/rent-filter",
+      query: (body) => ({
+        url: "/rent/filter",
         method: "PATCH",
-        body: JSON.stringify(body),
+        body,
       }),
 
       invalidatesTags: ["Rent"],

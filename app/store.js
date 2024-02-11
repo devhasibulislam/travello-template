@@ -15,9 +15,8 @@
 
 import authSlice from "@/features/auth/authSlice";
 import bookingSlice from "@/features/booking/bookingSlice";
+import filterSlice from "@/features/filter/filterSlice";
 import rentSlice from "@/features/rent/rentSlice";
-import rentFilterSlice from "@/features/rentFilter/rentFilterSlice";
-import travelAvailabilitySlice from "@/features/travelAvailability/travelAvailabilitySlice";
 import userSlice from "@/features/user/userSlice";
 import { travelloApi } from "@/services/travello";
 import { configureStore } from "@reduxjs/toolkit";
@@ -29,9 +28,8 @@ export const store = configureStore({
     user: userSlice,
     auth: authSlice,
     rent: rentSlice,
-    availability: travelAvailabilitySlice,
     booking: bookingSlice,
-    filter: rentFilterSlice,
+    filter: filterSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(travelloApi.middleware),

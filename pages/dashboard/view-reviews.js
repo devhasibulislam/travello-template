@@ -203,6 +203,7 @@ const AdminRows = () => {
     deleteReviewLoading,
     fetchReviewsData,
     fetchReviewsError,
+    fetchingReviewsLoading,
   ]);
 
   return (

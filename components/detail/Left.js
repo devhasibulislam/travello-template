@@ -57,7 +57,7 @@ const Left = () => {
 
   useEffect(() => {
     setValue("price", tour?.price * members);
-  }, [members, setValue]);
+  }, [members, setValue, tour?.price]);
 
   const [
     addToCart,

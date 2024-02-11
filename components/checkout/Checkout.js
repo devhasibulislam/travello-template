@@ -188,7 +188,7 @@ function CheckoutForm() {
           integratePurchase({
             rent: rent?._id,
             price: rent?.price * rent?.members,
-            duration
+            duration,
           });
           setMessage("Just one more step. Your payment was successful!");
           break;
@@ -203,7 +203,7 @@ function CheckoutForm() {
           break;
       }
     });
-  }, [stripe]);
+  }, [stripe, rent?.price, rent?.members, rent?._id, integratePurchase]);
 
   const handleAddPayment = async (event) => {
     event.preventDefault();

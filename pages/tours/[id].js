@@ -47,7 +47,7 @@ const DetailPage = () => {
     if (error?.data) {
       toast.error(error?.data?.message, { id: "rent-data" });
     }
-  }, [data, error]);
+  }, [data, error, dispatch]);
 
   return (
     <>
