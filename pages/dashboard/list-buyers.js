@@ -14,10 +14,40 @@
  */
 
 import Panel from "@/layouts/Panel";
-import React from "react";
+import { useGetUsersQuery } from "@/services/user/userApi";
+import React, { useEffect, useMemo } from "react";
+import { toast } from "react-hot-toast";
 
 const ListBuyers = () => {
-  return <Panel>Show users who buy solo rents and for admin display all in details</Panel>;
+  const { isLoading, data, error } = useGetUsersQuery();
+  const users = useMemo(() => data?.data || [], [data]);
+  const buyers = users.filter((user) => user?.purchases?.length > 0);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error?.data?.message, {
+        id: "sellers",
+      });
+    }
+
+    if (isLoading) {
+      toast.loading("Fetching sellers...", {
+        id: "sellers",
+      });
+    }
+
+    if (data) {
+      toast.success(data?.message, {
+        id: "sellers",
+      });
+    }
+  }, [isLoading, data, error]);
+
+  return (
+    <Panel>
+      Show users who buy solo rents and for admin display all in details
+    </Panel>
+  );
 };
 
 export default ListBuyers;
