@@ -30,25 +30,30 @@ const filterSlice = createSlice({
     setCategory: (state, action) => {
       state.category = action.payload;
     },
+    
     setCountries: (state, action) => {
       state.countries = action.payload;
     },
+
     setPriceRange: (state, action) => {
       state.priceRange = action.payload;
     },
+
     setDateRange: (state, action) => {
       state.dateRange = action.payload;
     },
+
     // setRatings: (state, action) => {
     //   state.ratings = action.payload;
     // },
-    resetFilter: (state) => {
-      state.category = [];
-      state.countries = [];
-      state.priceRange = { min: 5, max: 500 };
-      state.dateRange = { startDate: null, endDate: null };
-      // state.ratings = [];
-    },
+
+    // resetFilter: (state) => {
+    //   state.category = [];
+    //   state.countries = [];
+    //   state.priceRange = { min: 5, max: 500 };
+    //   state.dateRange = { startDate: null, endDate: null };
+    //   // state.ratings = [];
+    // },
   },
 });
 
@@ -58,6 +63,6 @@ export const {
   setPriceRange,
   setDateRange,
   // setRatings,
-  resetFilter,
+  // resetFilter,
 } = filterSlice.actions;
 export default filterSlice.reducer;

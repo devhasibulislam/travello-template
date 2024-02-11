@@ -16,17 +16,17 @@
 import hotelTypes from "@/data/hotelTypes";
 import useGetCountries from "@/hooks/useGetCountries";
 import React, { useState } from "react";
-import { AiOutlineReload } from "react-icons/ai";
-import { BiSolidStar } from "react-icons/bi";
-import { useDispatch, useSelector } from "react-redux";
+// import { AiOutlineReload } from "react-icons/ai";
+// import { BiSolidStar } from "react-icons/bi";
+import { useDispatch } from "react-redux";
 import LoadImage from "../shared/image/LoadImage";
 import {
-  resetFilter,
   setCategory,
   setCountries,
   setDateRange,
   setPriceRange,
   // setRatings,
+  // resetFilter,
 } from "@/features/filter/filterSlice";
 
 const FilterSidebar = () => {
@@ -76,13 +76,13 @@ const FilterSidebar = () => {
   //   dispatch(setRatings(selectedOptions));
   // };
 
-  function renderStarIcons(count) {
-    const stars = [];
-    for (let i = 0; i < count; i++) {
-      stars.push(<BiSolidStar key={i} className="text-yellow-500 h-4 w-4" />);
-    }
-    return stars;
-  }
+  // function renderStarIcons(count) {
+  //   const stars = [];
+  //   for (let i = 0; i < count; i++) {
+  //     stars.push(<BiSolidStar key={i} className="text-yellow-500 h-4 w-4" />);
+  //   }
+  //   return stars;
+  // }
 
   return (
     <aside className="lg:col-span-3 md:col-span-4 col-span-12">
@@ -244,7 +244,7 @@ const FilterSidebar = () => {
         </div> */}
 
         {/* Reset Button */}
-        <button
+        {/* <button
           className="px-4 py-1 border border-primary !rounded-secondary flex flex-row gap-x-2 items-center w-fit bg-secondary text-primary"
           onClick={() => {
             setSelectedCategory([]);
@@ -256,7 +256,7 @@ const FilterSidebar = () => {
           }}
         >
           Reset Filter
-        </button>
+        </button> */}
       </section>
     </aside>
   );
