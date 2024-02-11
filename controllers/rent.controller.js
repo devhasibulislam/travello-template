@@ -254,44 +254,40 @@ export async function getFilteredRents(req) {
   try {
     let filter = {};
 
-    if (req.body.startDate) {
+    if (req.body.dateRange && req.body.dateRange.startDate) {
       filter["duration.startDate"] = {
         $gte: new Date(req.body.dateRange.startDate),
       };
     }
 
-    if (req.body.endDate) {
+    if (req.body.dateRange && req.body.dateRange.endDate) {
       filter["duration.endDate"] = {
         $lte: new Date(req.body.dateRange.endDate),
       };
     }
 
-    if (req.body.price) {
-      filter.price = { $lte: req.body.priceRange.min };
+    if (req.body.priceRange) {
+      filter.price = {
+        $gte: req.body.priceRange.min,
+        $lte: req.body.priceRange.max,
+      };
     }
 
-    if (req.body.countries) {
+    if (req.body.countries && req.body.countries.length > 0) {
       filter.location = { $in: req.body.countries };
     }
 
-    if (req.body.category) {
+    if (req.body.category && req.body.category.length > 0) {
       filter.type = { $in: req.body.category };
     }
 
     const rents = await Rent.find(filter);
 
-    if (rents) {
-      return {
-        success: true,
-        message: "Successfully fetch filtered rents",
-        data: rents,
-      };
-    } else {
-      return {
-        success: false,
-        message: "Failed to fetch filtered rents",
-      };
-    }
+    return {
+      success: true,
+      message: "Successfully fetch filtered rents",
+      data: rents || [],
+    };
   } catch (error) {
     return {
       success: false,
