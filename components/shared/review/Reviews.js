@@ -17,89 +17,41 @@ import Container from "@/components/shared/container/Container";
 import HighlightText from "@/components/shared/highlightText/HighlightText";
 import LoadImage from "@/components/shared/image/LoadImage";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { AiFillStar } from "react-icons/ai";
 import { RiChatQuoteFill } from "react-icons/ri";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
+import { useGetAllReviewsQuery } from "@/services/review/reviewApi";
+import { toast } from "react-hot-toast";
 
 const animation = { duration: 50000, easing: (t) => t };
 
 const Reviews = ({ className }) => {
-  const reviews = [
-    {
-      name: "Eli Jang",
-      avatar: "/assets/static/Travellers Review/1.png",
-      location: "China",
-      rating: 5,
-      createdAt: "20 July 2023",
-      summary:
-        "As I already said we really enjoyed the trip what so ever and I reckon that the best moments were when we visited. Exceeded all expectations! Flawless arrangements, knowledgeable guides, and unforgettable experiences. Highly recommend!",
-    },
-    {
-      name: "Warren Chae",
-      avatar: "/assets/static/Travellers Review/2.png",
-      location: "New York",
-      rating: 3,
-      createdAt: "22 July 2023",
-      summary:
-        "As I already said we really enjoyed the trip what so ever and I reckon that the best moments were when we visited. Exceeded all expectations! Flawless arrangements, knowledgeable guides, and unforgettable experiences. Highly recommend!",
-    },
-    {
-      name: "Euantae Lee",
-      avatar: "/assets/static/Travellers Review/3.png",
-      location: "New York",
-      rating: 3,
-      createdAt: "22 July 2023",
-      summary:
-        "As I already said we really enjoyed the trip what so ever and I reckon that the best moments were when we visited. Exceeded all expectations! Flawless arrangements, knowledgeable guides, and unforgettable experiences. Highly recommend!",
-    },
-    {
-      name: "Jack Lee",
-      avatar: "/assets/static/Travellers Review/4.png",
-      location: "New York",
-      rating: 3,
-      createdAt: "22 July 2023",
-      summary:
-        "As I already said we really enjoyed the trip what so ever and I reckon that the best moments were when we visited. Exceeded all expectations! Flawless arrangements, knowledgeable guides, and unforgettable experiences. Highly recommend!",
-    },
-    {
-      name: "Sinu Han",
-      avatar: "/assets/static/Travellers Review/5.png",
-      location: "China",
-      rating: 5,
-      createdAt: "20 July 2023",
-      summary:
-        "As I already said we really enjoyed the trip what so ever and I reckon that the best moments were when we visited. Exceeded all expectations! Flawless arrangements, knowledgeable guides, and unforgettable experiences. Highly recommend!",
-    },
-    {
-      name: "Jack Kim",
-      avatar: "/assets/static/Travellers Review/6.png",
-      location: "New York",
-      rating: 3,
-      createdAt: "22 July 2023",
-      summary:
-        "As I already said we really enjoyed the trip what so ever and I reckon that the best moments were when we visited. Exceeded all expectations! Flawless arrangements, knowledgeable guides, and unforgettable experiences. Highly recommend!",
-    },
-    {
-      name: "Hudson Ahn",
-      avatar: "/assets/static/Travellers Review/7.png",
-      location: "New York",
-      rating: 3,
-      createdAt: "22 July 2023",
-      summary:
-        "As I already said we really enjoyed the trip what so ever and I reckon that the best moments were when we visited. Exceeded all expectations! Flawless arrangements, knowledgeable guides, and unforgettable experiences. Highly recommend!",
-    },
-    {
-      name: "Daniel Park",
-      avatar: "/assets/static/Travellers Review/8.png",
-      location: "New York",
-      rating: 3,
-      createdAt: "22 July 2023",
-      summary:
-        "As I already said we really enjoyed the trip what so ever and I reckon that the best moments were when we visited. Exceeded all expectations! Flawless arrangements, knowledgeable guides, and unforgettable experiences. Highly recommend!",
-    },
-  ];
+  const { isLoading, data, error } = useGetAllReviewsQuery();
+  const reviews = useMemo(() => data?.data || [], [data]);
+
+  console.log(reviews);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error?.data?.message, {
+        id: "reviews",
+      });
+    }
+
+    if (isLoading) {
+      toast.loading("Fetching reviews...", {
+        id: "reviews",
+      });
+    }
+
+    if (data) {
+      toast.success(data?.message, {
+        id: "reviews",
+      });
+    }
+  }, [isLoading, data, error]);
 
   const [sliderRef] = useKeenSlider({
     loop: true,
@@ -155,41 +107,104 @@ const Reviews = ({ className }) => {
               Testimonials
             </p>
           </article>
-          <div ref={sliderRef} className="keen-slider">
-            {reviews.map((review, index) => (
-              <article
-                key={index}
-                className="group relative flex flex-col gap-y-4 border hover:border-primary transition-colors ease-linear p-4 rounded keen-slider__slide"
-              >
-                <div className="flex flex-row gap-x-2.5 items-end">
-                  <LoadImage
-                    src={review.avatar}
-                    alt={review.name}
-                    width={50}
-                    height={50}
-                    className="rounded h-[50px] w-[50px] object-cover"
-                  />
-                  <div className="flex flex-row justify-between w-full">
-                    <div className="">
-                      <h2 className="">{review.name}</h2>
-                      <p className="text-xs">Traveler, {review.location}</p>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <p className="text-sm flex flex-row items-center">
-                        <AiFillStar className="text-[#F9BC1D]" /> •{" "}
-                        {review.rating}
-                      </p>
-                      <p className="text-xs">{review.createdAt}</p>
+
+          {!isLoading && reviews?.length === 0 && (
+            <p className="text-sm text-red-500">No reviews found!</p>
+          )}
+
+          {isLoading && reviews?.length === 0 ? (
+            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="flex flex-col gap-y-4 border rounded p-3"
+                >
+                  <div className="flex flex-row gap-x-2.5 items-end">
+                    <div className="!h-[50px] !w-[50px] rounded animate-pulse bg-gray-200"></div>
+                    <div className="flex flex-row justify-between w-full">
+                      <div className="flex flex-col gap-y-1 w-full">
+                        <div className="w-2/3 h-4 animate-pulse rounded bg-gray-200"></div>
+                        <div className="w-3/4 h-4 animate-pulse rounded bg-gray-200"></div>
+                      </div>
+                      <div className="flex flex-col items-end gap-y-1 w-full">
+                        <div className="w-2/3 h-4 animate-pulse rounded bg-gray-200"></div>
+                        <div className="w-3/4 h-4 animate-pulse rounded bg-gray-200"></div>
+                      </div>
                     </div>
                   </div>
+
+                  <div className="flex flex-col gap-y-1.5">
+                    <div className="w-full h-4 animate-pulse rounded bg-gray-200"></div>
+                    <div className="w-full h-4 animate-pulse rounded bg-gray-200"></div>
+                    <div className="w-3/4 h-4 animate-pulse rounded bg-gray-200"></div>
+                  </div>
                 </div>
-                <p className="text-sm">
-                  <RiChatQuoteFill className="absolute top-2 left-2 w-6 h-6 text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity ease-linear delay-100 line-clamp-6" />
-                  {review.summary}
-                </p>
-              </article>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div ref={sliderRef} className="keen-slider">
+              {reviews?.map((review) => (
+                <article
+                  key={review?._id}
+                  className="group relative flex flex-col gap-y-4 border hover:border-primary transition-colors ease-linear p-4 rounded keen-slider__slide"
+                >
+                  <div className="flex flex-row gap-x-2.5 items-end">
+                    <LoadImage
+                      src={review?.reviewer?.avatar?.url}
+                      alt={review?.reviewer?.avatar?.public_id}
+                      width={50}
+                      height={50}
+                      className="rounded h-[50px] w-[50px] object-cover"
+                    />
+                    <div className="flex flex-row justify-between w-full">
+                      <div className="">
+                        <h2 className="">{review?.reviewer?.name}</h2>
+                        <p className="text-xs">{review.rent.location}</p>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <p className="text-sm flex flex-row items-center">
+                          <AiFillStar className="text-[#F9BC1D]" /> •{" "}
+                          {review.rating}
+                        </p>
+                        <p className="text-xs">
+                          {(() => {
+                            const date = new Date(review?.createdAt);
+                            const day = date.getDate();
+                            const suffix = (day) => {
+                              if (day >= 11 && day <= 13) return "th";
+                              switch (day % 10) {
+                                case 1:
+                                  return "st";
+                                case 2:
+                                  return "nd";
+                                case 3:
+                                  return "rd";
+                                default:
+                                  return "th";
+                              }
+                            };
+                            const formattedDate =
+                              day +
+                              suffix(day) +
+                              " " +
+                              date.toLocaleDateString("en-GB", {
+                                month: "long",
+                                year: "numeric",
+                              });
+                            return formattedDate;
+                          })()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-sm">
+                    <RiChatQuoteFill className="absolute top-2 left-2 w-6 h-6 text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity ease-linear delay-100 line-clamp-6" />
+                    {review.comment}
+                  </p>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </Container>
     </section>
