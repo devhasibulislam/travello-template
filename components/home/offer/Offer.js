@@ -20,14 +20,6 @@ import LoadImage from "@/components/shared/image/LoadImage";
 import React from "react";
 
 const Offer = () => {
-  // function toBase64(str) {
-  //   return btoa(unescape(encodeURIComponent(str)));
-  // }
-
-  // function shimmer(width, height) {
-  //   return `https://placehold.co/${width}x${height}.svg`;
-  // }
-
   return (
     <section
       className="bg-no-repeat bg-contain bg-center h-full py-12"
@@ -49,10 +41,6 @@ const Offer = () => {
                 height={7}
                 width={275}
                 className="mt-1.5"
-                // placeholder="blur"
-                // blurDataURL={`data:image/svg+xml;base64,${toBase64(
-                //   shimmer(135, 7)
-                // )}`}
               />
             </h1>
             <p className="text-base">
@@ -65,14 +53,16 @@ const Offer = () => {
               alt="offer-1"
               width={650}
               height={290}
-              className="rounded object-cover border border-primary"
+              className="rounded object-cover border border-primary cursor-pointer"
+              onClick={() => window.open("/tours", "_self")}
             />
             <LoadImage
               src="/assets/static/Offers Explorer Banner/2.png"
               alt="offer-2"
               width={650}
               height={290}
-              className="rounded object-cover border border-primary"
+              className="rounded object-cover border border-primary cursor-pointer"
+              onClick={() => window.open("/tours", "_self")}
             />
           </div>
         </div>
