@@ -173,7 +173,7 @@ const Left = () => {
             onSubmit={handleSubmit(handleIntegratePurchase)}
           >
             {/* startDate & endDate */}
-            <div className="flex md:flex-row flex-col justify-between gap-2">
+            <div className="flex lg:flex-row flex-col justify-between gap-2">
               <Controller
                 control={control}
                 rules={{ required: true }}

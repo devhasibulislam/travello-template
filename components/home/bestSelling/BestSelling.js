@@ -65,7 +65,7 @@ const BestSelling = ({ className }) => {
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-6">
+          <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 gap-6">
             {tours?.length === 0 || isLoading
               ? Array.from({ length: 4 }, (_, index) => (
                   <SkeletonCard key={index} />

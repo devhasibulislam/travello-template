@@ -46,11 +46,15 @@ function SellerView({ rents }) {
     setSelectedUser(user); // Set the selected user when opening the modal
   };
 
-  console.log(selectedUser);
-
   return (
     <>
-      <div className="grid grid-cols-4 gap-4">
+      {!isLoading && buyers?.length === 0 && (
+        <p className="h-full w-full flex justify-center items-center">
+          Your buyers list is empty!
+        </p>
+      )}
+
+      <div className="grid lg:grid-cols-4 md:grid-cols-2 gird-cols-1 gap-4">
         {buyers?.map(({ users }) =>
           users?.map((user) => (
             <div
@@ -157,47 +161,53 @@ function AdminView() {
     setSelectedUser(user); // Set the selected user when opening the modal
   };
 
-  console.log(selectedUser);
-
   return (
     <>
-      <div className="grid grid-cols-4 gap-4">
-        {buyers?.map((user) => (
-          <div
-            key={user?._id}
-            className="flex flex-col gap-y-4 p-4 rounded border border-primary/20 hover:border-primary"
-          >
-            <article className="flex flex-col gap-y-0.5 items-center">
-              <LoadImage
-                src={user?.avatar?.url}
-                alt={user?.avatar?.public_id}
-                height={50}
-                width={50}
-                className="h-[50px] w-[50px] object-cover rounded-secondary"
-              />
-              <h1 className="text-base">{user?.name}</h1>
-              <p className="text-sm">{user?.email}</p>
-              <p className="text-xs">{user?.address}</p>
-              <p className="text-xs mt-1 flex flex-row items-center gap-x-1">
-                Total
-                <span
-                  className="border border-teal-900 text-teal-900 bg-teal-100/50 px-1.5 py-0 rounded uppercase"
-                  style={{ fontSize: "10px" }}
-                >
-                  {user?.rents?.length} rents
-                </span>{" "}
-              </p>
-            </article>
-            <button
-              type="button"
-              className="text-sm bg-secondary rounded-secondary border border-primary hover:bg-primary hover:border-secondary hover:text-white transition-colors px-4 py-1 mt-auto"
-              onClick={() => openModal(user)}
+      {!isLoading && buyers?.length === 0 && (
+        <p className="h-full w-full flex justify-center items-center">
+          Your buyers is empty!
+        </p>
+      )}
+
+      {!isLoading && buyers?.length > 0 && (
+        <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
+          {buyers?.map((user) => (
+            <div
+              key={user?._id}
+              className="flex flex-col gap-y-4 p-4 rounded border border-primary/20 hover:border-primary"
             >
-              View Rents
-            </button>
-          </div>
-        ))}
-      </div>
+              <article className="flex flex-col gap-y-0.5 items-center">
+                <LoadImage
+                  src={user?.avatar?.url}
+                  alt={user?.avatar?.public_id}
+                  height={50}
+                  width={50}
+                  className="h-[50px] w-[50px] object-cover rounded-secondary"
+                />
+                <h1 className="text-base">{user?.name}</h1>
+                <p className="text-sm">{user?.email}</p>
+                <p className="text-xs">{user?.address}</p>
+                <p className="text-xs mt-1 flex flex-row items-center gap-x-1">
+                  Total
+                  <span
+                    className="border border-teal-900 text-teal-900 bg-teal-100/50 px-1.5 py-0 rounded uppercase"
+                    style={{ fontSize: "10px" }}
+                  >
+                    {user?.rents?.length} rents
+                  </span>{" "}
+                </p>
+              </article>
+              <button
+                type="button"
+                className="text-sm bg-secondary rounded-secondary border border-primary hover:bg-primary hover:border-secondary hover:text-white transition-colors px-4 py-1 mt-auto"
+                onClick={() => openModal(user)}
+              >
+                View Rents
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {!isLoading && isOpen && selectedUser && (
         <Modal
