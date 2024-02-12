@@ -21,14 +21,12 @@ import MobileMenu from "../mobileMenu/MobileMenu";
 
 const UserMenu = () => {
   return (
-    <section className="lg:block hidden">
-      <div className="flex flex-row items-center gap-x-4">
-        <Search />
-        <Favorites />
-        <Cart />
-        <MobileMenu />
-      </div>
-    </section>
+    <div className="flex flex-row items-center gap-x-4">
+      <Search />
+      <Favorites />
+      <Cart />
+      <MobileMenu />
+    </div>
   );
 };
 
