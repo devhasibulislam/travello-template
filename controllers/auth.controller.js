@@ -160,11 +160,39 @@ export async function persistUser(req) {
           "user",
           {
             path: "rent",
-            populate: ["users", "owner", "reviews"],
+            populate: [
+              {
+                path: "users",
+                populate: [
+                  {
+                    path: "purchases",
+                    populate: ["user", "rent"],
+                  },
+                ],
+              },
+              "owner",
+              "reviews",
+            ],
           },
         ],
       },
-      "rents",
+      {
+        path: "rents",
+        populate: [
+          {
+            path: "users",
+            populate: [
+              {
+                path: "purchases",
+                populate: ["user", "rent"],
+              },
+            ],
+          },
+          ,
+          "owner",
+          "reviews",
+        ],
+      },
     ]);
 
     if (user) {

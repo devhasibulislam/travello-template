@@ -24,7 +24,19 @@ import removePhoto from "@/utils/remove.util";
 // get all users
 export async function getUsers() {
   try {
-    const users = await User.find();
+    const users = await User.find().populate([
+      "rents",
+      {
+        path: "purchases",
+        populate: [
+          "user",
+          {
+            path: "rent",
+            populate: ["users", "owner", "reviews"],
+          },
+        ],
+      },
+    ]);
 
     if (users) {
       return {
