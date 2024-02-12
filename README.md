@@ -1,3 +1,5 @@
+Full Video on YouTube [CodeCraftMERN](https://www.youtube.com/@CodeCraftMERN)
+
 # Travello
 
 > Perfect for all kinds of travel agency. Including tours, hotel booking, activity/event, travel experiences, online booking, room bnb, villa rental, holiday rental, resort rental, cruises, car rentals, real estate, flight ticket, and more.
@@ -10,18 +12,43 @@ With its modern design and intuitive layout, the Home Page welcomes users to an 
 
 ## Features
 
-- Total **17** Pages
+### Pages
+
+- Total **18** Pages
   - Home `x1`
   - Rent Detail `x1`
+  - Rent Filter `x1`
   - Auth `x3`
-  - Dashboard `x4`
-- Authentication & Role Authorization `Admin`, `Seller` & `Buyer`
-- Real-Time Cart & Update Activity
-- Admin & Seller Dashboard
-- Secure Channel Bypass
-- Advance Search Filter
-- Advance Rent Filter
-- Avatar, Thumbnail & Gallery Review
+  - Dashboard `x12`
+    - Dashboard Main `x1`
+    - Profile Page `x1`
+    - Rent CRUD Page `x3`
+    - Users CRUD Page `x3`
+    - Review CRUD Page `x1`
+    - Purchases page `x1`
+    - Cart page `x1`
+    - Favorites page `x1`
+
+### Modals
+
+- Total `x7` Modals
+  - Custom Checkout `x1`
+  - Delete Rent `x1`
+  - Delete User `x1`
+  - All Reviews `x1`
+  - User Cart `x1`
+  - User Favorites `x1`
+  - Advance Search Filter `x1`
+
+### Core
+
+- Real-Time Interaction on `Cart`, `Favorites`, `Create`, `Read`, `Update` & `Delete`
+- Authentication & Role Authorization `Admin` & `User`
+- Advance search filter `highlight matched words & letters`
+- Admin & User dashboard separate panel
+- `Stripe` payment gateway integration
+- Secure Channel Bypass role base
+- Avatar & Gallery Preview
 - Fully Responsive for `Mobile`, `Tablet`, `Laptop` & `Desktop`
 - Intuitive and user-friendly design
 
@@ -57,7 +84,6 @@ With its modern design and intuitive layout, the Home Page welcomes users to an 
 | react-redux             |
 | tailwind-scrollbar-hide |
 | tailwindcss             |
-| world-countries         |
 
 # Development
 
@@ -86,7 +112,16 @@ ATLAS_URI="ATLAS_URI"
 CLOUD_NAME="CLOUD_NAME"
 API_KEY="API_KEY"
 API_SECRET="API_SECRET"
+
+# Stripe Payment Credentials
+STRIPE_SECRET_KEY="YOUR_STRIPE_PUBLISHABLE_KEY"
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="YOUR_STRIPE_SECRET_KEY"
 ```
+
+# Access
+
+- User `stan@gmail.com` & `Stan@123`
+- Admin `admin@gmail.com` & `Admin@123` => `don't create any occurrence :(`
 
 # Important Links
 
@@ -96,4 +131,4 @@ API_SECRET="API_SECRET"
 # Author
 
 - Developer - [Hasibul Islam](https://www.linkedin.com/in/devhasibulislam/)
-- Designer - [MD Saiful Islam ](https://www.linkedin.com/in/md-saiful-islam-361959220/)
+- Designer - [MD Saiful Islam ](https://www.linkedin.com/in/md-saiful-islam-361959220/) `dedicate to`
