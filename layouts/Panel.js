@@ -76,7 +76,17 @@ const Panel = ({ children }) => {
       icon: <TbUserShare className="w-5 h-5" />,
     },
     {
-      name: "List Users",
+      name: (
+        <p className="text-black flex flex-row gap-x-2 items-center w-full h-fit">
+          List Users{" "}
+          <span
+            className="border border-cyan-900 text-cyan-900 bg-cyan-100/50 px-1.5 py-0 rounded uppercase"
+            style={{ fontSize: "10px" }}
+          >
+            admin
+          </span>
+        </p>
+      ),
       path: "/dashboard/list-users",
       icon: <FiUsers className="w-5 h-5" />,
     },
