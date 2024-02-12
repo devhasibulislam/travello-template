@@ -197,8 +197,8 @@ const Reviews = ({ className }) => {
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm">
-                    <RiChatQuoteFill className="absolute top-2 left-2 w-6 h-6 text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity ease-linear delay-100 line-clamp-6" />
+                  <p className="text-sm line-clamp-4">
+                    <RiChatQuoteFill className="absolute top-2 left-2 w-6 h-6 text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity ease-linear delay-100" />
                     {review.comment}
                   </p>
                 </article>

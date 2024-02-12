@@ -192,7 +192,7 @@ const AllReviews = ({ className }) => {
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm">
+                  <p className="text-sm line-clamp-4">
                     <RiChatQuoteFill className="absolute top-2 left-2 w-6 h-6 text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity ease-linear delay-100" />
                     {review.comment}
                   </p>
