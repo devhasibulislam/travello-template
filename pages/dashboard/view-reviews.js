@@ -60,7 +60,7 @@ const UserRows = ({ reviews }) => {
           No review added yet!
         </p>
       ) : (
-        <section className="lg:w-3/4 md:w-4/5 w-full">
+        <section className="lg:w-3/4 md:w-4/5 w-full flex flex-col gap-y-4">
           {reviews?.map(
             ({ reviewer, rent, _id, comment, rating, createdAt }) => (
               <div
@@ -213,7 +213,7 @@ const AdminRows = () => {
           No review added yet!
         </p>
       ) : (
-        <section className="lg:w-3/4 md:w-4/5 w-full">
+        <section className="lg:w-3/4 md:w-4/5 w-full flex flex-col gap-y-4">
           {reviews?.map(
             ({ reviewer, rent, _id, comment, rating, createdAt }) => (
               <div
