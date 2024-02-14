@@ -48,7 +48,7 @@ function SellerView({ rents }) {
 
   return (
     <>
-      {!isLoading && buyers?.length === 0 && (
+      {buyers?.length === 0 && (
         <p className="h-full w-full flex justify-center items-center">
           Your buyers list is empty!
         </p>
