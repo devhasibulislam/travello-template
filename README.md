@@ -1,4 +1,4 @@
-Full Video on YouTube [CodeCraftMERN](https://www.youtube.com/@CodeCraftMERN)
+Full Video on YouTube [CodeCraftMERN](https://youtu.be/lUIinWktJW8?si=LWi3QSpC0f-r-FAX)
 
 # Travello
 
