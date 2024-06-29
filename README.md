@@ -121,7 +121,6 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="YOUR_STRIPE_SECRET_KEY"
 # Access
 
 - User `stan@gmail.com` & `Stan@123`
-- Admin `admin@gmail.com` & `Admin@123` => `don't create any occurrence :(`
 
 # Important Links
 
